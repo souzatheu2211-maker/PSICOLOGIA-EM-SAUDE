@@ -71,7 +71,7 @@ const Game = () => {
 
     const channel = supabase
       .channel(`room-${roomCode}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, (payload: any) => {
+      .on('wgwpostgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, (payload: any) => {
         setState(prev => ({ ...prev, roomStatus: payload.new.status }));
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `current_room_id=eq.${roomCode}` }, () => {
