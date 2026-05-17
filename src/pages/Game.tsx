@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { QUESTIONS, PROFESSOR_TRICK } from '@/data/questions';
 import { GameState, Player, Question } from '@/types/game';
@@ -45,14 +45,22 @@ const Game = () => {
     questionStartedAt: null
   });
 
-  // Lógica Anti-Cheat: Elimina se sair da aba/fechar navegador
+  // Refs para evitar stale closures no timer
+  const selectedOptionRef = useRef<number | null>(null);
+  const stateRef = useRef(state);
+
+  useEffect(() => {
+    selectedOptionRef.current = state.selectedOption;
+    stateRef.current = state;
+  }, [state]);
+
+  // Lógica Anti-Cheat
   useEffect(() => {
     if (isHost || state.roomStatus !== 'playing' || state.isGameOver || isSpectator) return;
 
     const handleExit = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Marca como eliminado e remove da sala imediatamente
         await supabase.from('profiles').update({ 
           is_eliminated: true,
           current_room_id: null 
@@ -60,10 +68,7 @@ const Game = () => {
       }
     };
 
-    // Detecta fechamento da aba ou recarregamento
     window.addEventListener('beforeunload', handleExit);
-    
-    // Detecta se o usuário mudou de aba (opcional, mas agressivo contra pesquisa)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         handleExit();
@@ -73,7 +78,6 @@ const Game = () => {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
     return () => {
       window.removeEventListener('beforeunload', handleExit);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -148,7 +152,86 @@ const Game = () => {
     return () => { supabase.removeChannel(channel); };
   }, [roomCode]);
 
-  // Timer Sincronizado por Timestamp
+  const getCurrentQuestion = (index: number): Question => {
+    if (index === 999) return PROFESSOR_TRICK;
+    return QUESTIONS[index];
+  };
+
+  const handleTimeUp = async () => {
+    // Usamos refs aqui para pegar os valores MAIS RECENTES, ignorando a clausura do useEffect
+    if (stateRef.current.showResult) return;
+    
+    const currentQ = getCurrentQuestion(stateRef.current.currentQuestionIndex);
+    const selectedOption = selectedOptionRef.current;
+    const isCorrect = selectedOption === currentQ.correctAnswer;
+    const noAnswer = selectedOption === null;
+    
+    setState(prev => ({ ...prev, showResult: true }));
+
+    if (!isHost && !isSpectator) {
+      let shouldEliminate = false;
+      let pointsChange = 0;
+
+      const basePoints = currentQ.difficulty === 'fácil' ? 10 : currentQ.difficulty === 'médio' ? 20 : 40;
+      const multiplier = currentQ.isBonus ? 2 : 1;
+      const totalPoints = basePoints * multiplier;
+
+      if (isCorrect) {
+        pointsChange = totalPoints;
+        showSuccess(`CORRETO! +${pointsChange} pts`);
+      } else {
+        pointsChange = -totalPoints;
+        
+        if (stateRef.current.currentQuestionIndex < 3) shouldEliminate = true;
+        if (currentQ.isMaldade) shouldEliminate = true;
+        if (stateRef.current.currentQuestionIndex === 999) shouldEliminate = true;
+        if (currentQ.difficulty === 'difícil') shouldEliminate = true;
+        if (noAnswer) shouldEliminate = true;
+
+        if (shouldEliminate) {
+          setIsSpectator(true);
+          showError(noAnswer ? "TEMPO ESGOTADO! VOCÊ FOI ELIMINADO." : "RESPOSTA ERRADA! VOCÊ FOI ELIMINADO.");
+        } else {
+          showError(`ERROU! ${pointsChange} pts`);
+        }
+      }
+
+      const newScore = Math.max(0, stateRef.current.score + pointsChange);
+      setState(prev => ({ ...prev, score: newScore }));
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').update({ 
+          current_score: newScore,
+          is_eliminated: shouldEliminate 
+        }).eq('id', user.id);
+      }
+    }
+
+    if (isHost) {
+      setTimeout(async () => {
+        let nextIndex = stateRef.current.currentQuestionIndex + 1;
+        
+        if (stateRef.current.currentQuestionIndex === 8) {
+          nextIndex = 999;
+        } else if (stateRef.current.currentQuestionIndex === 999) {
+          nextIndex = 9;
+        }
+
+        if (nextIndex >= QUESTIONS.length && stateRef.current.currentQuestionIndex !== 999) {
+          await supabase.from('rooms').update({ status: 'finished' }).eq('code', roomCode);
+          setState(prev => ({ ...prev, isGameOver: true }));
+        } else {
+          await supabase.from('rooms').update({ 
+            current_question_index: nextIndex,
+            question_started_at: new Date().toISOString()
+          }).eq('code', roomCode);
+        }
+      }, 6000);
+    }
+  };
+
+  // Timer Sincronizado
   useEffect(() => {
     if (state.roomStatus !== 'playing' || state.isGameOver || !state.questionStartedAt || state.showResult) return;
 
@@ -171,106 +254,17 @@ const Game = () => {
     return () => clearInterval(timer);
   }, [state.questionStartedAt, state.roomStatus, state.showResult]);
 
-  const getCurrentQuestion = (): Question => {
-    if (state.currentQuestionIndex === 999) return PROFESSOR_TRICK;
-    return QUESTIONS[state.currentQuestionIndex];
-  };
-
-  const handleTimeUp = async () => {
-    if (state.showResult) return;
-    
-    const currentQ = getCurrentQuestion();
-    const isCorrect = state.selectedOption === currentQ.correctAnswer;
-    const noAnswer = state.selectedOption === null;
-    
-    setState(prev => ({ ...prev, showResult: true }));
-
-    if (!isHost && !isSpectator) {
-      let shouldEliminate = false;
-      let pointsChange = 0;
-
-      const basePoints = currentQ.difficulty === 'fácil' ? 10 : currentQ.difficulty === 'médio' ? 20 : 40;
-      const multiplier = currentQ.isBonus ? 2 : 1;
-      const totalPoints = basePoints * multiplier;
-
-      if (isCorrect) {
-        pointsChange = totalPoints;
-        showSuccess(`CORRETO! +${pointsChange} pts`);
-      } else {
-        pointsChange = -totalPoints;
-        
-        if (state.currentQuestionIndex < 3) shouldEliminate = true;
-        if (currentQ.isMaldade) {
-          shouldEliminate = true;
-          pointsChange = -20;
-        }
-        if (state.currentQuestionIndex === 999) {
-          shouldEliminate = true;
-          pointsChange = -20;
-        }
-        if (currentQ.difficulty === 'difícil') shouldEliminate = true;
-        if (noAnswer) shouldEliminate = true;
-
-        if (shouldEliminate) {
-          setIsSpectator(true);
-          showError(noAnswer ? "TEMPO ESGOTADO! VOCÊ FOI ELIMINADO." : "RESPOSTA ERRADA! VOCÊ FOI ELIMINADO.");
-        } else {
-          showError(`ERROU! ${pointsChange} pts`);
-        }
-      }
-
-      const newScore = Math.max(0, state.score + pointsChange);
-      setState(prev => ({ ...prev, score: newScore }));
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from('profiles').update({ 
-          current_score: newScore,
-          is_eliminated: shouldEliminate 
-        }).eq('id', user.id);
-      }
-    }
-
-    if (isHost) {
-      setTimeout(async () => {
-        let nextIndex = state.currentQuestionIndex + 1;
-        
-        if (state.currentQuestionIndex === 8) {
-          nextIndex = 999;
-        } else if (state.currentQuestionIndex === 999) {
-          nextIndex = 9;
-        }
-
-        if (nextIndex >= QUESTIONS.length && state.currentQuestionIndex !== 999) {
-          await supabase.from('rooms').update({ status: 'finished' }).eq('code', roomCode);
-          setState(prev => ({ ...prev, isGameOver: true }));
-        } else {
-          await supabase.from('rooms').update({ 
-            current_question_index: nextIndex,
-            question_started_at: new Date().toISOString()
-          }).eq('code', roomCode);
-        }
-      }, 6000);
-    }
-  };
-
   const startGame = async () => {
     if (!isHost) return;
-    
-    const { error } = await supabase
-      .from('rooms')
-      .update({ 
-        status: 'playing',
-        current_question_index: 0,
-        question_started_at: new Date().toISOString()
-      })
-      .eq('code', roomCode);
-
-    if (error) showError("Erro ao iniciar partida.");
+    await supabase.from('rooms').update({ 
+      status: 'playing',
+      current_question_index: 0,
+      question_started_at: new Date().toISOString()
+    }).eq('code', roomCode);
   };
 
   const useAid = (type: 'fiftyFifty' | 'hint' | 'probabilities') => {
-    const currentQ = getCurrentQuestion();
+    const currentQ = getCurrentQuestion(state.currentQuestionIndex);
     if (state.aidsUsed[type] || usedAidThisTurn || isSpectator || isHost || currentQ.isMaldade || state.currentQuestionIndex === 999) return;
     
     if (type === 'fiftyFifty') {
@@ -293,7 +287,7 @@ const Game = () => {
   if (isHost && state.roomStatus === 'playing' && !state.isGameOver) {
     return (
       <TVView 
-        question={getCurrentQuestion()}
+        question={getCurrentQuestion(state.currentQuestionIndex)}
         timeLeft={state.timeLeft}
         roomCode={roomCode || ''}
         players={roomPlayers}
@@ -304,13 +298,12 @@ const Game = () => {
     );
   }
 
-  const currentQ = getCurrentQuestion();
+  const currentQ = getCurrentQuestion(state.currentQuestionIndex);
   const isEliminatory = state.currentQuestionIndex < 3 || currentQ.difficulty === 'difícil' || currentQ.isMaldade || state.currentQuestionIndex === 999;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 overflow-hidden">
       <div className="flex-1 flex flex-col p-6 relative overflow-y-auto custom-scrollbar">
-        {/* Header */}
         <div className="flex justify-between items-center mb-8 glass-dark p-6 rounded-[2.5rem] border-2 border-white/10">
           <div className="flex items-center gap-4">
             <div className="bg-blue-600 p-3 rounded-2xl"><BrainCircuit size={24} className="text-white" /></div>
