@@ -6,12 +6,14 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Plus, LogIn, ArrowLeft, Sparkles } from 'lucide-react';
+import { Play, Plus, LogIn, ArrowLeft, Sparkles, Sword } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import Footer from '@/components/Footer';
 
 const Lobby = () => {
   const [code, setCode] = useState('');
+  const [warName, setWarName] = useState('');
+  const [showWarNameInput, setShowWarNameInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -36,28 +38,35 @@ const Lobby = () => {
     setLoading(false);
   };
 
+  const handleJoinClick = () => {
+    if (!code) {
+      showError("Digite o código da sala primeiro!");
+      return;
+    }
+    setShowWarNameInput(true);
+  };
+
   const joinRoom = async () => {
-    if (!code) return;
+    if (!warName.trim()) {
+      showError("Escolha seu Nome de Guerra para o Ranking!");
+      return;
+    }
+    
     setLoading(true);
     const { data, error } = await supabase.from('rooms').select('*').eq('code', code.toUpperCase()).single();
     
     if (error || !data) {
       showError("Sala não encontrada! Verifique o código.");
     } else {
+      localStorage.setItem('currentPlayer', warName.trim());
       navigate(`/game?room=${data.code}`);
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 pb-32 relative">
       <div className="w-full max-w-3xl space-y-8 animate-in fade-in duration-700">
-        <div className="w-full flex justify-start">
-          <Button variant="ghost" onClick={() => navigate('/home')} className="text-blue-400 hover:text-blue-300">
-            <ArrowLeft className="mr-2" size={18} /> Voltar
-          </Button>
-        </div>
-
         <div className="text-center">
           <div className="inline-flex p-3 bg-blue-600/20 rounded-2xl mb-4">
             <Sparkles className="text-blue-400 animate-pulse" size={32} />
@@ -94,33 +103,68 @@ const Lobby = () => {
               <CardTitle className="text-white text-2xl font-black italic uppercase">Entrar na Sala</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pb-10 px-8">
-              <div className="space-y-2">
-                <Input 
-                  placeholder="CÓDIGO" 
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  className="bg-white/5 border-white/10 text-white text-center font-black text-2xl h-14 rounded-2xl focus:ring-blue-500/50"
-                />
-              </div>
-              <Button 
-                onClick={joinRoom}
-                disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 h-14 font-black rounded-2xl shadow-lg shadow-blue-900/20 transition-all active:scale-95"
-              >
-                ENTRAR AGORA
-              </Button>
+              {!showWarNameInput ? (
+                <>
+                  <div className="space-y-2">
+                    <Input 
+                      placeholder="CÓDIGO" 
+                      value={code}
+                      onChange={(e) => setCode(e.target.value.toUpperCase())}
+                      className="bg-white/5 border-white/10 text-white text-center font-black text-2xl h-14 rounded-2xl focus:ring-blue-500/50"
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleJoinClick}
+                    disabled={loading}
+                    className="w-full bg-blue-600 hover:bg-blue-500 h-14 font-black rounded-2xl shadow-lg shadow-blue-900/20 transition-all active:scale-95"
+                  >
+                    ENTRAR AGORA
+                  </Button>
+                </>
+              ) : (
+                <div className="space-y-4 animate-in slide-in-from-right duration-300">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-blue-300 uppercase ml-1 flex items-center gap-1">
+                      <Sword size={12} /> Nome de Guerra (Ranking)
+                    </label>
+                    <Input 
+                      placeholder="Ex: Freud da FSSS" 
+                      value={warName}
+                      onChange={(e) => setWarName(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white font-bold h-12 rounded-2xl focus:ring-blue-500/50"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => setShowWarNameInput(false)}
+                      className="flex-1 text-slate-400"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      onClick={joinRoom}
+                      disabled={loading}
+                      className="flex-[2] bg-blue-600 hover:bg-blue-500 h-12 font-black rounded-2xl"
+                    >
+                      CONFIRMAR
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
         <div className="flex flex-col items-center gap-6 pt-8">
           <div className="flex items-center gap-8">
-            <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-16 object-contain opacity-70" />
-            <img src="/src/assets/logo-enf.png" alt="ENF" className="h-16 object-contain opacity-70" />
+            <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-16 object-contain animate-float" />
+            <img src="/src/assets/logo-enf.png" alt="ENF" className="h-16 object-contain animate-float [animation-delay:0.5s]" />
           </div>
-          <Footer />
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
