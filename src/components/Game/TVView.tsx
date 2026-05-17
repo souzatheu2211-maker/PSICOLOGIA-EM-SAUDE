@@ -158,7 +158,7 @@ const TVView = ({
                 <div className="bg-blue-600/20 p-3 rounded-2xl">
                   <Star size={24} className="animate-spin-slow" />
                 </div>
-                <span className="font-black uppercase text-lg tracking-widest italic">Explicação do grupo</span>
+                <span className="font-black uppercase text-lg tracking-widest italic">Explicação do Professor</span>
               </div>
               <p className="text-white text-xl md:text-3xl leading-relaxed italic font-medium">
                 "{question.explanation}"
