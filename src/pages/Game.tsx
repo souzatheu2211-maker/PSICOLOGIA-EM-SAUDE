@@ -62,7 +62,7 @@ const Game = () => {
           name: p.name,
           avatar_url: p.avatar_url,
           score: p.current_score,
-          is_eliminated: p.is_ewetw4liminated
+          is_eliminated: p.is_eliminated
         })));
       }
     };
@@ -71,7 +71,7 @@ const Game = () => {
 
     const channel = supabase
       .channel(`room-${roomCode}`)
-      .on('wgwpostgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, (payload: any) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, (payload: any) => {
         setState(prev => ({ ...prev, roomStatus: payload.new.status }));
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `current_room_id=eq.${roomCode}` }, () => {
