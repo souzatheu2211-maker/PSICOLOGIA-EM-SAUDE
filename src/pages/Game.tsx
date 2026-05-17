@@ -11,7 +11,7 @@ import RankingSidebar from '@/components/Game/RankingSidebar';
 import TVView from '@/components/Game/TVView';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
-import { Users, Play, Sparkles, Timer as TimerIcon, Info, BrainCircuit } from 'lucide-react';
+import { Users, Play, Sparkles, Timer as TimerIcon, Info, BrainCircuit, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { Progress } from '@/components/ui/progress';
@@ -44,6 +44,7 @@ const Game = () => {
     hiddenOptions: []
   });
 
+  // Real-time: Monitora status da sala e jogadores
   useEffect(() => {
     if (!roomCode) return;
 
@@ -71,10 +72,23 @@ const Game = () => {
 
     const channel = supabase
       .channel(`room-${roomCode}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, (payload: any) => {
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'rooms', 
+        filter: `code=eq.${roomCode}` 
+      }, (payload: any) => {
         setState(prev => ({ ...prev, roomStatus: payload.new.status }));
+        if (payload.new.status === 'playing') {
+          showSuccess("A PARTIDA COMEÇOU! PREPARE-SE!");
+        }
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `current_room_id=eq.${roomCode}` }, () => {
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'profiles', 
+        filter: `current_room_id=eq.${roomCode}` 
+      }, () => {
         fetchRoomData();
       })
       .subscribe();
@@ -88,15 +102,19 @@ const Game = () => {
     setPlayerName(name);
   }, [navigate]);
 
+  // Timer Logic
   useEffect(() => {
     if (state.roomStatus !== 'playing' || state.isGameOver || state.showResult) return;
+
     if (state.timeLeft <= 0) {
       handleTimeUp();
       return;
     }
+
     const timer = setInterval(() => {
       setState(prev => ({ ...prev, timeLeft: prev.timeLeft - 1 }));
     }, 1000);
+
     return () => clearInterval(timer);
   }, [state.timeLeft, state.isGameOver, state.showResult, state.roomStatus]);
 
@@ -150,15 +168,20 @@ const Game = () => {
 
   const startGame = async () => {
     if (!isHost) return;
-    const { error } = await supabase.from('rooms').update({ status: 'playing' }).eq('code', roomCode);
+    
+    const { error } = await supabase
+      .from('rooms')
+      .update({ status: 'playing' })
+      .eq('code', roomCode);
+
     if (error) {
       showError("Erro ao iniciar partida.");
       return;
     }
+    
     await supabase.from('profiles')
       .update({ current_score: 0, is_eliminated: false })
       .eq('current_room_id', roomCode);
-    showSuccess("A partida começou!");
   };
 
   const useAid = (type: 'fiftyFifty' | 'hint' | 'probabilities') => {
@@ -201,16 +224,16 @@ const Game = () => {
   if (state.isGameOver) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 p-6 text-center relative overflow-hidden">
-        <div className="max-w-3xl w-full glass-dark border-8 border-blue-600 p-10 md:p-16 rounded-[3rem] md:rounded-[5rem] shadow-[0_0_150px_rgba(37,99,235,0.3)] animate-in zoom-in duration-1000 relative z-10">
-          <Trophy className="text-yellow-500 animate-bounce mx-auto mb-6 md:mb-10 w-24 h-24 md:w-32 md:h-32" />
-          <h2 className="text-4xl md:text-6xl font-black text-white italic uppercase mb-6 tracking-tighter">
+        <div className="max-w-3xl w-full glass-dark border-8 border-blue-600 p-16 rounded-[5rem] shadow-[0_0_150px_rgba(37,99,235,0.3)] animate-in zoom-in duration-1000 relative z-10">
+          <Trophy className="text-yellow-500 animate-bounce mx-auto mb-10" size={120} />
+          <h2 className="text-6xl font-black text-white italic uppercase mb-6 tracking-tighter">
             {state.isWinner ? "VITÓRIA!" : "FIM DE JOGO"}
           </h2>
-          <div className="bg-blue-900/30 p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] mb-10 border-2 border-blue-500/20">
+          <div className="bg-blue-900/30 p-10 rounded-[3rem] mb-10 border-2 border-blue-500/20">
             <p className="text-blue-300 font-black uppercase tracking-widest text-xs mb-2">Pontuação</p>
-            <p className="text-6xl md:text-8xl font-black text-yellow-400">{state.score}</p>
+            <p className="text-8xl font-black text-yellow-400">{state.score}</p>
           </div>
-          <Button onClick={() => navigate('/home')} className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 h-16 px-12 text-xl font-black rounded-2xl">
+          <Button onClick={() => navigate('/home')} className="bg-blue-600 hover:bg-blue-500 h-16 px-12 text-xl font-black rounded-2xl">
             VOLTAR AO INÍCIO
           </Button>
         </div>
@@ -221,55 +244,67 @@ const Game = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 overflow-hidden">
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col p-4 md:p-8 relative overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col p-6 relative overflow-y-auto custom-scrollbar">
         {/* Header da Arena */}
-        <div className="flex justify-between items-center mb-6 glass-dark p-4 rounded-2xl border border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-600 p-2 rounded-xl shadow-lg"><Users size={20} className="text-white" /></div>
+        <div className="flex justify-between items-center mb-8 glass-dark p-6 rounded-[2.5rem] border-2 border-white/10 shadow-2xl">
+          <div className="flex items-center gap-4">
+            <div className="bg-blue-600 p-3 rounded-2xl shadow-lg animate-pulse"><Users size={24} className="text-white" /></div>
             <div>
-              <p className="text-[8px] font-black text-blue-400 uppercase tracking-widest">Sala</p>
-              <p className="text-white font-black text-sm">{roomCode}</p>
+              <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em]">Sala Ativa</p>
+              <p className="text-white font-black text-2xl italic tracking-tighter">{roomCode}</p>
             </div>
           </div>
           {state.roomStatus === 'playing' && (
             <div className="text-center">
-              <p className="text-[8px] font-black text-yellow-500 uppercase tracking-widest">Tempo</p>
-              <div className={cn("flex items-center gap-2 font-black text-2xl italic", state.timeLeft <= 5 ? "text-red-500 animate-pulse" : "text-white")}>
-                <TimerIcon size={18} /> {state.timeLeft}s
+              <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Tempo Restante</p>
+              <div className={cn(
+                "flex items-center gap-3 font-black text-4xl italic transition-all duration-300", 
+                state.timeLeft <= 5 ? "text-red-500 scale-110 animate-pulse" : "text-white"
+              )}>
+                <TimerIcon size={28} /> {state.timeLeft}s
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex-1 flex flex-col justify-center items-center max-w-4xl mx-auto w-full py-4">
+        <div className="flex-1 flex flex-col justify-center items-center max-w-5xl mx-auto w-full py-4">
           {state.roomStatus === 'waiting' ? (
-            <div className="w-full glass-dark p-8 md:p-12 rounded-[2.5rem] md:rounded-[4rem] border-4 border-blue-500/30 text-center animate-in zoom-in duration-500">
-              <div className="bg-blue-600/20 w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <BrainCircuit className="text-blue-400 animate-pulse" size={40} />
+            <div className="w-full glass-dark p-16 rounded-[4rem] border-4 border-blue-500/30 text-center animate-in zoom-in duration-700 shadow-[0_0_100px_rgba(37,99,235,0.2)]">
+              <div className="bg-gradient-to-br from-blue-600 to-purple-600 w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                <BrainCircuit className="text-white animate-pulse" size={48} />
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-white italic uppercase mb-2">Aguardando Início</h2>
-              <p className="text-blue-300 font-bold text-xs uppercase tracking-[0.3em] mb-8">Código: {roomCode}</p>
+              <h2 className="text-5xl font-black text-white italic uppercase mb-4 tracking-tighter">Arena de Conhecimento</h2>
+              <div className="bg-white/5 py-4 px-10 rounded-3xl border border-white/10 inline-block mb-12">
+                <p className="text-blue-300 font-black text-xs uppercase tracking-widest mb-1">Código de Acesso</p>
+                <p className="text-white font-black text-5xl tracking-[0.2em]">{roomCode}</p>
+              </div>
               
               {isHost ? (
                 <Button 
                   onClick={startGame} 
-                  className="w-full bg-green-600 hover:bg-green-500 h-16 md:h-20 text-xl md:text-2xl font-black rounded-2xl md:rounded-3xl shadow-2xl shadow-green-900/40 transition-all active:scale-95"
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 h-24 text-3xl font-black rounded-[2.5rem] shadow-2xl shadow-green-900/40 transition-all active:scale-95 group"
                 >
-                  <Play className="mr-3" size={32} /> INICIAR PARTIDA
+                  <Play className="mr-4 group-hover:scale-125 transition-transform" size={40} /> INICIAR PARTIDA
                 </Button>
               ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <Sparkles className="text-yellow-500 animate-pulse" size={32} />
-                  <p className="text-white font-black uppercase tracking-widest text-sm">O professor iniciará em breve...</p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-3 text-blue-400 animate-pulse">
+                    <Sparkles size={32} />
+                    <p className="font-black text-xl uppercase tracking-widest">Aguardando o Professor...</p>
+                  </div>
+                  <p className="text-slate-500 font-medium italic">Prepare sua mente, o desafio já vai começar!</p>
                 </div>
               )}
             </div>
           ) : (
-            <div className="w-full space-y-6">
+            <div className="w-full space-y-8 animate-in fade-in duration-1000">
               <ScoreBoard score={state.score} current={state.currentQuestionIndex + 1} total={QUESTIONS.length} playerName={playerName} />
               
-              <div className="w-full">
-                <Progress value={(state.timeLeft / 30) * 100} className={cn("h-2 bg-slate-800", state.timeLeft <= 5 ? "bg-red-900" : "bg-blue-900")} />
+              <div className="w-full px-4">
+                <Progress value={(state.timeLeft / 30) * 100} className={cn(
+                  "h-3 bg-slate-900 rounded-full border border-white/10 transition-all duration-1000", 
+                  state.timeLeft <= 5 ? "bg-red-900" : "bg-blue-900"
+                )} />
               </div>
               
               <QuestionCard 
@@ -283,12 +318,12 @@ const Game = () => {
               />
 
               {state.showResult && (
-                <div className="w-full glass-dark p-6 rounded-2xl border-2 border-blue-500/30 animate-in slide-in-from-bottom duration-500">
-                  <div className="flex items-center gap-2 mb-2 text-blue-400">
-                    <Info size={16} />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Explicação</span>
+                <div className="w-full glass-dark p-8 rounded-[3rem] border-4 border-blue-500/30 animate-in slide-in-from-bottom duration-700 shadow-2xl">
+                  <div className="flex items-center gap-3 mb-4 text-blue-400">
+                    <Info size={24} />
+                    <span className="font-black uppercase text-sm tracking-[0.3em] italic">Explicação do Professor</span>
                   </div>
-                  <p className="text-white text-sm leading-relaxed italic font-medium">"{QUESTIONS[state.currentQuestionIndex].explanation}"</p>
+                  <p className="text-white text-lg md:text-xl leading-relaxed italic font-medium">"{QUESTIONS[state.currentQuestionIndex].explanation}"</p>
                 </div>
               )}
 
@@ -302,7 +337,7 @@ const Game = () => {
 
       {/* Ranking Sidebar - Hidden on mobile, visible on large screens */}
       {!isMobile && (
-        <div className="w-80 h-full border-l border-white/10">
+        <div className="w-96 h-full border-l border-white/10">
           <RankingSidebar players={roomPlayers} />
         </div>
       )}
