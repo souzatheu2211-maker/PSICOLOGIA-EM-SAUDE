@@ -154,7 +154,7 @@ const Game = () => {
       let shouldEliminate = false;
       let pointsChange = 0;
 
-      // Lógica de Pontuação e Eliminação
+      // Lógica de Pontuação e Penalidade
       const basePoints = currentQ.difficulty === 'fácil' ? 10 : currentQ.difficulty === 'médio' ? 20 : 40;
       const multiplier = currentQ.isBonus ? 2 : 1;
       const totalPoints = basePoints * multiplier;
@@ -169,18 +169,18 @@ const Game = () => {
         if (state.currentQuestionIndex < 3) shouldEliminate = true;
         if (currentQ.isMaldade) {
           shouldEliminate = true;
-          pointsChange = -20;
+          pointsChange = -20; // Penalidade fixa da maldade
         }
         if (state.currentQuestionIndex === 999) {
           shouldEliminate = true;
-          pointsChange = -20;
+          pointsChange = -20; // Penalidade fixa do professor
         }
         if (currentQ.difficulty === 'difícil') shouldEliminate = true;
         if (noAnswer) shouldEliminate = true;
 
         if (shouldEliminate) {
           setIsSpectator(true);
-          showError(noAnswer ? "TEMPO ESGOTADO! ELIMINADO." : "RESPOSTA ERRADA! ELIMINADO.");
+          showError(noAnswer ? "TEMPO ESGOTADO! VOCÊ FOI ELIMINADO." : "RESPOSTA ERRADA! VOCÊ FOI ELIMINADO.");
         } else {
           showError(`ERROU! ${pointsChange} pts`);
         }
@@ -203,7 +203,6 @@ const Game = () => {
       setTimeout(async () => {
         let nextIndex = state.currentQuestionIndex + 1;
         
-        // Lógica da Pegadinha do Professor (após a 9)
         if (state.currentQuestionIndex === 8) {
           nextIndex = 999;
         } else if (state.currentQuestionIndex === 999) {
@@ -273,6 +272,9 @@ const Game = () => {
     );
   }
 
+  const currentQ = getCurrentQuestion();
+  const isEliminatory = state.currentQuestionIndex < 3 || currentQ.difficulty === 'difícil' || currentQ.isMaldade || state.currentQuestionIndex === 999;
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 overflow-hidden">
       <div className="flex-1 flex flex-col p-6 relative overflow-y-auto custom-scrollbar">
@@ -328,32 +330,32 @@ const Game = () => {
               <ScoreBoard score={state.score} current={state.currentQuestionIndex === 999 ? 10 : state.currentQuestionIndex + 1} total={QUESTIONS.length} playerName={playerName} />
               
               {/* Alerta de Pergunta Eliminatória */}
-              {(state.currentQuestionIndex < 3 || getCurrentQuestion().difficulty === 'difícil' || getCurrentQuestion().isMaldade || state.currentQuestionIndex === 999) && (
+              {isEliminatory && (
                 <div className="bg-red-600/20 border-2 border-red-600 p-4 rounded-2xl flex items-center justify-center gap-3 animate-pulse">
                   <AlertTriangle className="text-red-500" />
-                  <span className="text-red-500 font-black uppercase italic tracking-widest">⚠️ PERGUNTA ELIMINATÓRIA - SE ERRAR, SAI DO JOGO!</span>
+                  <span className="text-red-500 font-black uppercase italic tracking-widest">⚠️ PERGUNTA ELIMINATÓRIA - Se errar, você sai do jogo!</span>
                 </div>
               )}
 
               <QuestionCard 
-                question={getCurrentQuestion()} 
+                question={currentQ} 
                 onAnswer={(idx) => !state.showResult && !isSpectator && setState(prev => ({ ...prev, selectedOption: idx }))} 
                 selectedOption={state.selectedOption}
                 showResult={state.showResult}
                 probabilities={probabilities}
-                isMaldade={getCurrentQuestion().isMaldade || state.currentQuestionIndex === 999}
+                isMaldade={currentQ.isMaldade || state.currentQuestionIndex === 999}
                 hiddenOptions={state.hiddenOptions}
               />
 
               {state.showResult && (
                 <div className="glass-dark p-8 rounded-[3rem] border-4 border-blue-500/30 animate-in slide-in-from-bottom duration-500">
                   <p className="text-blue-400 font-black uppercase text-xs mb-2 tracking-widest">Justificativa do Professor</p>
-                  <p className="text-white text-xl italic leading-relaxed">"{getCurrentQuestion().explanation}"</p>
+                  <p className="text-white text-xl italic leading-relaxed">"{currentQ.explanation}"</p>
                 </div>
               )}
 
               {!isSpectator && !state.showResult && (
-                <Aids used={state.aidsUsed} onUse={useAid} disabled={getCurrentQuestion().isMaldade || state.currentQuestionIndex === 999} usedThisTurn={usedAidThisTurn} />
+                <Aids used={state.aidsUsed} onUse={useAid} disabled={currentQ.isMaldade || state.currentQuestionIndex === 999} usedThisTurn={usedAidThisTurn} />
               )}
             </div>
           )}
