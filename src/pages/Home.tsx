@@ -8,6 +8,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import Footer from '@/components/Footer';
 
+// Importando as imagens
+import logoFsss from '@/assets/logo-fsss.png';
+import logoEnf from '@/assets/logo-enf.png';
+
 const Home = () => {
   const [profile, setProfile] = useState<any>(null);
   const navigate = useNavigate();
@@ -71,8 +75,8 @@ const Home = () => {
         </Card>
 
         <div className="flex items-center gap-10 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-16 object-contain" />
-          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-16 object-contain" />
+          <img src={logoFsss} alt="FSSS" className="h-16 object-contain" />
+          <img src={logoEnf} alt="ENF" className="h-16 object-contain" />
         </div>
 
         <Footer />

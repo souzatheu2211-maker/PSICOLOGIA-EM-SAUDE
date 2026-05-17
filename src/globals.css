@@ -18,7 +18,8 @@
   body {
     @apply bg-slate-950 text-white overflow-x-hidden min-h-screen;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-image: url('/src/assets/fundo-psi.png');
+    /* Usando caminho relativo para o Vite processar a imagem */
+    background-image: url('./assets/fundo-psi.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

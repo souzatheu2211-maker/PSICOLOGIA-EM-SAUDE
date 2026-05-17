@@ -10,6 +10,10 @@ import { showError, showSuccess } from '@/utils/toast';
 import { LogIn, UserPlus, Loader2, BrainCircuit } from 'lucide-react';
 import Footer from '@/components/Footer';
 
+// Importando as imagens para o Vite processar
+import logoFsss from '@/assets/logo-fsss.png';
+import logoEnf from '@/assets/logo-enf.png';
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -64,8 +68,8 @@ const Auth = () => {
       <div className="relative z-10 w-full max-w-md flex flex-col items-center">
         {/* Logos with Animation */}
         <div className="flex items-center gap-6 mb-4">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-14 object-contain animate-float" />
-          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-14 object-contain animate-float [animation-delay:0.3s]" />
+          <img src={logoFsss} alt="FSSS" className="h-14 object-contain animate-float" />
+          <img src={logoEnf} alt="ENF" className="h-14 object-contain animate-float [animation-delay:0.3s]" />
         </div>
 
         <Card className="w-full glass-dark border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-500 mb-4">

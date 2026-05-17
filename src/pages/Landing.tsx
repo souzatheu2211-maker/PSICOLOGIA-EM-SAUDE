@@ -7,6 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Brain, HeartPulse, Sparkles, Coffee } from 'lucide-react';
 import Footer from '@/components/Footer';
 
+// Importando as imagens
+import logoFsss from '@/assets/logo-fsss.png';
+import logoEnf from '@/assets/logo-enf.png';
+
 const Landing = () => {
   const navigate = useNavigate();
 
@@ -26,13 +30,13 @@ const Landing = () => {
         {/* Logos Section with Animation */}
         <div className="flex items-center justify-center gap-8 mb-6">
           <img 
-            src="/src/assets/logo-fsss.png" 
+            src={logoFsss} 
             alt="FSSS Logo" 
             className="h-20 md:h-24 object-contain drop-shadow-2xl animate-float" 
           />
           <div className="h-12 w-px bg-white/20"></div>
           <img 
-            src="/src/assets/logo-enf.png" 
+            src={logoEnf} 
             alt="Enfermagem Logo" 
             className="h-20 md:h-24 object-contain drop-shadow-2xl animate-float [animation-delay:0.5s]" 
           />
