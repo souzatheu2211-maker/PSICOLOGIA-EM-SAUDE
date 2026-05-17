@@ -60,10 +60,10 @@ const Auth = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="relative z-10 w-full max-w-md flex flex-col items-center gap-8">
-        {/* Logos */}
-        <div className="flex items-center gap-6 mb-2">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-12 object-contain" />
-          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-12 object-contain" />
+        {/* Logos - Increased sizes */}
+        <div className="flex items-center gap-8 mb-2">
+          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-16 md:h-20 object-contain" />
+          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-16 md:h-20 object-contain" />
         </div>
 
         <Card className="w-full glass-dark border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-500">

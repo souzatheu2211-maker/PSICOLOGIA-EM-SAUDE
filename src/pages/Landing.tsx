@@ -19,11 +19,11 @@ const Landing = () => {
       </div>
       
       <div className="relative z-10 max-w-4xl w-full flex flex-col items-center pt-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        {/* Logos Section */}
-        <div className="flex items-center justify-center gap-8 mb-12">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS Logo" className="h-16 md:h-20 object-contain drop-shadow-lg" />
-          <div className="h-12 w-px bg-white/20"></div>
-          <img src="/src/assets/logo-enf.png" alt="Enfermagem Logo" className="h-16 md:h-20 object-contain drop-shadow-lg" />
+        {/* Logos Section - Increased sizes */}
+        <div className="flex items-center justify-center gap-10 mb-12">
+          <img src="/src/assets/logo-fsss.png" alt="FSSS Logo" className="h-24 md:h-32 object-contain drop-shadow-2xl" />
+          <div className="h-16 w-px bg-white/20"></div>
+          <img src="/src/assets/logo-enf.png" alt="Enfermagem Logo" className="h-24 md:h-32 object-contain drop-shadow-2xl" />
         </div>
 
         <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-200 via-blue-400 to-blue-700 italic uppercase tracking-tighter mb-2 drop-shadow-2xl">

@@ -9,6 +9,7 @@ const Footer = () => {
       <div className="flex flex-col items-center text-center">
         <p className="font-medium text-xs uppercase tracking-widest">Desenvolvido por Matheus Souza</p>
         <p className="font-bold text-blue-400 text-[10px]">ENFERMAGEM - FSSS</p>
+        <p className="text-[9px] mt-1 opacity-60">© 2026 Todos os direitos reservados.</p>
       </div>
       <a 
         href="https://www.instagram.com/theu_souz2?igsh=NXhiejZ0OTh1cHd5&utm_source=qr" 
