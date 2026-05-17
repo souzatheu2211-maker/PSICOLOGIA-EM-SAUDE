@@ -6,9 +6,10 @@ export interface Question {
   options: string[];
   correctAnswer: number;
   difficulty: Difficulty;
+  explanation: string; // Justificativa da resposta
   isBonus?: boolean;
   isMaldade?: boolean;
-  hint?: string; // Nova propriedade para a ajuda de Dica
+  hint?: string;
 }
 
 export interface Player {
@@ -33,4 +34,5 @@ export interface GameState {
   timeLeft: number;
   selectedOption: number | null;
   showResult: boolean;
+  roomStatus: 'waiting' | 'playing' | 'finished';
 }

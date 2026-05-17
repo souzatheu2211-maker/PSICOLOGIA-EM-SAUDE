@@ -12,6 +12,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 1,
     difficulty: 'fácil',
+    explanation: "A OMS define saúde mental como um estado de bem-estar no qual o indivíduo percebe suas próprias habilidades, pode lidar com os estresses cotidianos, trabalhar produtivamente e contribuir para sua comunidade.",
     hint: "Pense na saúde como algo positivo e funcional, não apenas a falta de doença."
   },
   {
@@ -25,6 +26,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'fácil',
+    explanation: "A exaustão física e mental causada por plantões dobrados e falta de descanso é um dos principais gatilhos para transtornos como Burnout na enfermagem.",
     hint: "O cansaço físico extremo costuma andar de mãos dadas com o mental."
   },
   {
@@ -38,6 +40,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'fácil',
+    explanation: "A exposição constante ao sofrimento alheio pode gerar a 'fadiga por compaixão', resultando em desgaste emocional profundo.",
     hint: "A empatia pode gerar um custo emocional alto."
   },
   {
@@ -51,6 +54,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 0,
     difficulty: 'fácil',
+    explanation: "Um profissional psicologicamente abalado tem maior probabilidade de cometer erros técnicos e ser menos empático, prejudicando a segurança do paciente.",
     hint: "Quem não está bem, dificilmente consegue cuidar bem do outro."
   },
   {
@@ -65,6 +69,7 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 3,
     difficulty: 'fácil',
     isBonus: true,
+    explanation: "O descanso adequado e o lazer são fatores de proteção, não de adoecimento.",
     hint: "Procure a opção que descreve algo saudável e relaxante."
   },
   {
@@ -79,6 +84,7 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 2,
     difficulty: 'médio',
     isMaldade: true,
+    explanation: "O assédio moral caracteriza-se pela repetição de atos humilhantes que visam desestabilizar emocionalmente a vítima no ambiente laboral.",
     hint: "É algo tóxico, persistente e que visa diminuir o outro."
   },
   {
@@ -92,6 +98,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'médio',
+    explanation: "A imprevisibilidade das emergências e a responsabilidade sobre vidas humanas tornam o hospital um ambiente de alta carga tensional.",
     hint: "Hospitais são lugares de decisões rápidas e vida ou morte."
   },
   {
@@ -105,6 +112,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'médio',
+    explanation: "O dimensionamento inadequado de pessoal obriga o profissional a realizar tarefas além de sua capacidade, gerando estresse e fadiga.",
     hint: "É quando a demanda é muito maior que a capacidade humana de atender."
   },
   {
@@ -118,6 +126,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 0,
     difficulty: 'médio',
+    explanation: "O Burnout é o esgotamento profissional resultante de estresse crônico no local de trabalho que não foi gerenciado com sucesso.",
     hint: "O termo em inglês significa 'queimar-se por completo'."
   },
   {
@@ -132,6 +141,7 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 2,
     difficulty: 'médio',
     isBonus: true,
+    explanation: "A depressão grave pode levar à ideação suicida, exigindo intervenção imediata e suporte especializado.",
     hint: "A depressão profunda retira a esperança e o sentido da vida."
   },
   {
@@ -145,6 +155,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'difícil',
+    explanation: "Diferente da ansiedade normal, a patológica é desproporcional ao estímulo e causa prejuízos funcionais significativos.",
     hint: "Diferente do medo normal, ela é desproporcional e paralisante."
   },
   {
@@ -158,6 +169,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 1,
     difficulty: 'difícil',
+    explanation: "A instabilidade contratual e a perda de direitos aumentam a insegurança e o sofrimento psíquico do trabalhador.",
     hint: "A instabilidade gera insegurança e medo do futuro."
   },
   {
@@ -171,6 +183,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 1,
     difficulty: 'difícil',
+    explanation: "Hirigoyen descreve o assédio como um processo de destruição psicológica onde o agressor tenta anular a identidade da vítima.",
     hint: "É uma relação de poder onde um tenta anular a mente do outro."
   },
   {
@@ -184,6 +197,7 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 0,
     difficulty: 'difícil',
+    explanation: "A ansiedade ativa o sistema nervoso simpático, causando reações físicas como palpitações, sudorese e tremores.",
     hint: "O corpo reage como se estivesse em perigo iminente (luta ou fuga)."
   },
   {
@@ -198,6 +212,7 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 2,
     difficulty: 'difícil',
     isBonus: true,
+    explanation: "A saúde do profissional é indissociável da qualidade da assistência prestada. Cuidar do cuidador é uma estratégia de segurança do paciente.",
     hint: "Profissionais saudáveis salvam mais vidas."
   }
 ];
@@ -213,6 +228,7 @@ export const PROFESSOR_TRICK: Question = {
   ],
   correctAnswer: 0,
   difficulty: 'difícil',
+  explanation: "O professor Moacir Lira de Oliveira é o responsável por guiar seus conhecimentos nesta jornada!",
   hint: "Lembre-se da chamada ou do plano de ensino!"
 };
 
