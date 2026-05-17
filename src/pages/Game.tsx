@@ -11,7 +11,7 @@ import RankingSidebar from '@/components/Game/RankingSidebar';
 import TVView from '@/components/Game/TVView';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
-import { Home, Trophy, RotateCcw, Users, Eye, Maximize, Minimize, Timer as TimerIcon, Play, Info, Sparkles } from 'lucide-react';
+import { Users, Play, Sparkles, Timer as TimerIcon, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { Progress } from '@/components/ui/progress';
@@ -26,7 +26,6 @@ const Game = () => {
   const [playerName, setPlayerName] = useState('');
   const [isSpectator, setIsSpectator] = useState(false);
   const [roomPlayers, setRoomPlayers] = useState<Player[]>([]);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [probabilities, setProbabilities] = useState<number[]>([]);
   const [usedAidThisTurn, setUsedAidThisTurn] = useState(false);
 
@@ -155,7 +154,18 @@ const Game = () => {
 
   const startGame = async () => {
     if (!isHost) return;
-    await supabase.from('rooms').update({ status: 'playing' }).eq('code', roomCode);
+    // Atualiza o status da sala para 'playing' e reseta pontuações dos perfis na sala
+    const { error } = await supabase.from('rooms').update({ status: 'playing' }).eq('code', roomCode);
+    if (error) {
+      showError("Erro ao iniciar partida.");
+      return;
+    }
+    
+    // Reseta status de todos os jogadores na sala
+    await supabase.from('profiles')
+      .update({ current_score: 0, is_eliminated: false })
+      .eq('current_room_id', roomCode);
+
     showSuccess("A partida começou! Boa sorte a todos.");
   };
 
@@ -320,7 +330,7 @@ const Game = () => {
 
         {isSpectator && (
           <div className="bg-red-600/20 border-2 border-red-600/50 p-4 rounded-3xl mb-6 flex items-center justify-center gap-3 animate-pulse backdrop-blur-md">
-            <Eye className="text-red-500" size={20} />
+            <Info className="text-red-500" size={20} />
             <span className="text-red-500 font-black uppercase text-xs tracking-widest">Modo Espectador: Você foi eliminado!</span>
           </div>
         )}

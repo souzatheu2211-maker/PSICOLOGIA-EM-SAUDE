@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Plus, LogIn, Sparkles, Sword, BrainCircuit } from 'lucide-react';
+import { Play, Plus, LogIn, BrainCircuit } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import Footer from '@/components/Footer';
 
@@ -14,7 +14,6 @@ const Lobby = () => {
   const [profile, setProfile] = useState<any>(null);
   const [code, setCode] = useState('');
   const [warName, setWarName] = useState('');
-  const [showWarNameInput, setShowWarNameInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -24,6 +23,7 @@ const Lobby = () => {
       if (user) {
         const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
         setProfile(data);
+        if (data?.name) setWarName(data.name);
       }
     };
     fetchProfile();
@@ -47,7 +47,7 @@ const Lobby = () => {
 
       if (error) throw error;
 
-      localStorage.setItem('currentPlayer', profile.name || 'Professor');
+      localStorage.setItem('currentPlayer', warName || profile.name || 'Professor');
       showSuccess(`Sala criada! Código: ${newCode}`);
       navigate(`/game?room=${newCode}&host=true`);
     } catch (error: any) {
@@ -58,7 +58,15 @@ const Lobby = () => {
   };
 
   const joinRoom = async () => {
-    if (!code.startsWith('PSI')) {
+    if (!code.trim()) {
+      showError("Digite o código da sala!");
+      return;
+    }
+    if (!warName.trim()) {
+      showError("O Nome de Guerra é obrigatório!");
+      return;
+    }
+    if (!code.toUpperCase().startsWith('PSI')) {
       showError("O código deve começar com PSI!");
       return;
     }
@@ -72,18 +80,18 @@ const Lobby = () => {
       }
 
       if (data.status !== 'waiting') {
-        throw new Error("A partida já começou ou foi finalizada! Ninguém mais pode entrar.");
+        throw new Error("A partida já começou ou foi finalizada!");
       }
 
-      const finalName = warName.trim() || profile?.name || 'Anônimo';
-      localStorage.setItem('currentPlayer', finalName);
+      localStorage.setItem('currentPlayer', warName.trim());
       
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from('profiles').update({ 
           current_room_id: data.code,
           current_score: 0,
-          is_eliminated: false
+          is_eliminated: false,
+          name: warName.trim()
         }).eq('id', user.id);
       }
 
@@ -122,7 +130,6 @@ const Lobby = () => {
                 <div className="mx-auto w-16 h-16 bg-green-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Plus className="text-green-400" size={32} />
                 </div>
-                <CardTitle className="text-white text-2xl font-black italic uppercase">Modo Professor</CardTitle>
               </CardHeader>
               <CardContent className="pb-12 px-10">
                 <Button 
@@ -130,7 +137,7 @@ const Lobby = () => {
                   disabled={loading}
                   className="w-full bg-green-600 hover:bg-green-500 h-14 font-black rounded-2xl shadow-xl shadow-green-900/20 transition-all active:scale-95"
                 >
-                  CRIAR SALA PSI
+                  CRIAR SALA
                 </Button>
               </CardContent>
             </Card>
@@ -143,38 +150,32 @@ const Lobby = () => {
               </div>
               <CardTitle className="text-white text-2xl font-black italic uppercase">Entrar no Jogo</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6 pb-12 px-10">
-              {!showWarNameInput ? (
-                <>
-                  <Input 
-                    placeholder="PSI0000" 
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.toUpperCase())}
-                    className="bg-white/5 border-white/10 text-white text-center font-black text-2xl h-14 rounded-2xl focus:ring-purple-500/50"
-                  />
-                  <Button 
-                    onClick={() => code ? setShowWarNameInput(true) : showError("Digite o código!")}
-                    disabled={loading}
-                    className="w-full bg-purple-600 hover:bg-purple-500 h-14 font-black rounded-2xl shadow-xl shadow-purple-900/20 transition-all active:scale-95"
-                  >
-                    PRÓXIMO
-                  </Button>
-                </>
-              ) : (
-                <div className="space-y-4 animate-in slide-in-from-right duration-500">
-                  <Input 
-                    placeholder="Seu Nome de Guerra" 
-                    value={warName}
-                    onChange={(e) => setWarName(e.target.value)}
-                    className="bg-white/5 border-white/10 text-white font-bold h-12 rounded-2xl focus:ring-purple-500/50"
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
-                    <Button variant="ghost" onClick={() => setShowWarNameInput(false)} className="flex-1 text-slate-400">Voltar</Button>
-                    <Button onClick={joinRoom} disabled={loading} className="flex-[2] bg-purple-600 hover:bg-purple-500 h-12 font-black rounded-2xl">CONFIRMAR</Button>
-                  </div>
-                </div>
-              )}
+            <CardContent className="space-y-4 pb-12 px-10">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-purple-300 uppercase ml-1 tracking-widest">Código da Sala</label>
+                <Input 
+                  placeholder="PSI0000" 
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  className="bg-white/5 border-white/10 text-white text-center font-black text-xl h-12 rounded-2xl focus:ring-purple-500/50"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-purple-300 uppercase ml-1 tracking-widest">Nome de Guerra</label>
+                <Input 
+                  placeholder="Seu Nome" 
+                  value={warName}
+                  onChange={(e) => setWarName(e.target.value)}
+                  className="bg-white/5 border-white/10 text-white font-bold h-12 rounded-2xl focus:ring-purple-500/50"
+                />
+              </div>
+              <Button 
+                onClick={joinRoom}
+                disabled={loading}
+                className="w-full bg-purple-600 hover:bg-purple-500 h-14 font-black rounded-2xl shadow-xl shadow-purple-900/20 transition-all active:scale-95 mt-2"
+              >
+                ENTRAR
+              </Button>
             </CardContent>
           </Card>
         </div>
