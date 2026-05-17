@@ -3,10 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { Play, BookOpen, User, Trophy, LogOut, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import Footer from '@/components/Footer';
 
 const Home = () => {
@@ -26,86 +25,54 @@ const Home = () => {
     fetchProfile();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
+  const funnyPhrases = [
+    `A psicologia precisa de você, ${profile?.name?.split(' ')[0]}! Não deixe o Id ganhar hoje! 🧠`,
+    `Ei ${profile?.name?.split(' ')[0]}, seu Superego mandou avisar que hoje é dia de gabaritar! 🎓`,
+    `O plantão tá longe, mas o Show do Milhão tá perto. Vamos nessa, ${profile?.name?.split(' ')[0]}! ☕`,
+    `${profile?.name?.split(' ')[0]}, Freud explicaria sua vontade de jogar agora... e ele aprova! 🔥`
+  ];
+
+  const randomPhrase = funnyPhrases[Math.floor(Math.random() * funnyPhrases.length)];
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 relative">
-      <div className="w-full max-w-4xl flex flex-col items-center gap-8 animate-in fade-in duration-700">
-        {/* Header with User Info */}
-        <div className="w-full flex justify-between items-center glass p-4 rounded-3xl">
-          <div className="flex items-center gap-4">
-            <Avatar className="w-12 h-12 border-2 border-blue-500">
-              <AvatarImage src={profile?.avatar_url} />
-              <AvatarFallback className="bg-blue-900 text-white font-bold">
+    <div className="min-h-screen flex flex-col items-center p-6 pb-32 relative">
+      <div className="w-full max-w-4xl flex flex-col items-center gap-12 animate-in fade-in duration-1000">
+        
+        {/* Large Profile Section */}
+        <div className="flex flex-col items-center gap-6 mt-10">
+          <div className="relative">
+            <div className="absolute inset-0 bg-blue-500 blur-3xl opacity-20 animate-pulse"></div>
+            <Avatar className="w-48 h-48 border-8 border-blue-600/30 shadow-2xl relative z-10">
+              <AvatarImage src={profile?.avatar_url} className="object-cover" />
+              <AvatarFallback className="bg-blue-900 text-5xl font-black text-white">
                 {profile?.name?.substring(0, 2).toUpperCase() || '??'}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Bem-vindo, Acadêmico</p>
-              <h2 className="text-lg font-black text-white italic">{profile?.name || 'Carregando...'}</h2>
-            </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleLogout} className="text-red-400 hover:text-red-300 hover:bg-red-900/20">
-            <LogOut size={20} />
-          </Button>
+          <div className="text-center">
+            <p className="text-blue-400 font-bold uppercase tracking-[0.3em] text-xs mb-2">Status: Acadêmico Ativo</p>
+            <h2 className="text-4xl font-black text-white italic tracking-tighter">{profile?.name}</h2>
+          </div>
         </div>
 
         {/* Funny Message Card */}
-        <Card className="w-full glass-dark border-blue-500/30 rounded-[2.5rem] overflow-hidden">
-          <CardContent className="p-10 text-center">
-            <div className="inline-flex p-4 bg-blue-600/20 rounded-2xl mb-6">
-              <Sparkles className="text-blue-400 animate-pulse" size={32} />
+        <Card className="w-full glass-dark border-blue-500/30 rounded-[3rem] overflow-hidden shadow-[0_0_50px_rgba(37,99,235,0.1)]">
+          <CardContent className="p-12 text-center">
+            <div className="inline-flex p-5 bg-blue-600/20 rounded-3xl mb-8">
+              <Sparkles className="text-blue-400 animate-pulse" size={40} />
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white italic mb-4 leading-tight">
-              "Seu <span className="text-blue-400">Inconsciente</span> já sabe todas as respostas, agora só falta convencer o seu <span className="text-blue-400">Consciente</span> a não entrar em pânico!"
+            <h1 className="text-3xl md:text-5xl font-black text-white italic mb-6 leading-tight">
+              {profile ? randomPhrase : "Carregando sua energia psíquica..."}
             </h1>
-            <p className="text-slate-400 font-medium">
-              Escolha seu caminho e mostre que você domina a arte de cuidar da mente.
+            <p className="text-slate-400 text-lg font-medium max-w-2xl mx-auto">
+              "Onde o <span className="text-blue-400">Id</span> quer prazer imediato, o <span className="text-blue-400">Ego</span> escolhe estudar para o Show do Milhão!"
             </p>
           </CardContent>
         </Card>
 
-        {/* Navigation Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          <Button 
-            onClick={() => navigate('/lobby')}
-            className="h-32 glass hover:bg-blue-600/20 border-blue-500/50 rounded-[2rem] flex flex-col gap-2 group transition-all"
-          >
-            <Play className="text-blue-400 group-hover:scale-125 transition-transform" size={32} />
-            <span className="text-xl font-black italic uppercase">Jogar Agora</span>
-          </Button>
-          
-          <Button 
-            onClick={() => navigate('/study')}
-            className="h-32 glass hover:bg-green-600/20 border-green-500/50 rounded-[2rem] flex flex-col gap-2 group transition-all"
-          >
-            <BookOpen className="text-green-400 group-hover:scale-125 transition-transform" size={32} />
-            <span className="text-xl font-black italic uppercase">Materiais de Estudo</span>
-          </Button>
-
-          <Button 
-            onClick={() => navigate('/ranking')}
-            className="h-32 glass hover:bg-yellow-600/20 border-yellow-500/50 rounded-[2rem] flex flex-col gap-2 group transition-all"
-          >
-            <Trophy className="text-yellow-400 group-hover:scale-125 transition-transform" size={32} />
-            <span className="text-xl font-black italic uppercase">Ranking Geral</span>
-          </Button>
-
-          <Button 
-            onClick={() => navigate('/profile')}
-            className="h-32 glass hover:bg-purple-600/20 border-purple-500/50 rounded-[2rem] flex flex-col gap-2 group transition-all"
-          >
-            <User className="text-purple-400 group-hover:scale-125 transition-transform" size={32} />
-            <span className="text-xl font-black italic uppercase">Meu Perfil</span>
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-6 mt-4">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-12 object-contain opacity-50" />
-          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-12 object-contain opacity-50" />
+        <div className="flex items-center gap-10 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-16 object-contain" />
+          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-16 object-contain" />
         </div>
 
         <Footer />

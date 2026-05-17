@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Play, BookOpen, Trophy, User } from 'lucide-react';
+import { Home, Play, BookOpen, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const BottomNav = () => {
@@ -13,11 +13,9 @@ const BottomNav = () => {
     { icon: Home, label: 'Início', path: '/home' },
     { icon: Play, label: 'Jogar', path: '/lobby' },
     { icon: BookOpen, label: 'Estudar', path: '/study' },
-    { icon: Trophy, label: 'Ranking', path: '/ranking' },
     { icon: User, label: 'Perfil', path: '/profile' },
   ];
 
-  // Don't show on landing, auth or active game
   if (['/', '/auth', '/game'].includes(location.pathname)) return null;
 
   return (
