@@ -9,7 +9,7 @@ import ScoreBoard from '@/components/Game/ScoreBoard';
 import Aids from '@/components/Game/Aids';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
-import { Home, Trophy, RotateCcw, Users, Eye } from 'lucide-react';
+import { Home, Trophy, RotateCcw, Users, Eye, Maximize, Minimize } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 
@@ -17,6 +17,7 @@ const Game = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roomCode = searchParams.get('room');
+  const isHost = searchParams.get('host') === 'true';
   
   const [playerName, setPlayerName] = useState('');
   const [disabledOptions, setDisabledOptions] = useState<number[]>([]);
@@ -24,6 +25,7 @@ const Game = () => {
   const [isSpectator, setIsSpectator] = useState(false);
   const [roomPlayers, setRoomPlayers] = useState<Player[]>([]);
   const [showRanking, setShowRanking] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [state, setState] = useState<GameState>({
     currentQuestionIndex: 0,
@@ -45,14 +47,30 @@ const Game = () => {
     }
     setPlayerName(name);
     
-    // Simulação de Ranking em tempo real (em um app real usaríamos Realtime do Supabase)
+    // Se for host, tenta entrar em tela cheia automaticamente
+    if (isHost) {
+      toggleFullscreen();
+    }
+
+    // Simulação de Ranking
     const mockPlayers: Player[] = [
       { id: '1', name: name, score: 0, correctAnswers: 0, wrongAnswers: 0, status: 'finalizou', date: '' },
       { id: '2', name: 'Dr. Freud', score: 150, correctAnswers: 8, wrongAnswers: 1, status: 'finalizou', date: '' },
-      { id: '3', name: 'Enf. Jung', score: 80, correctAnswers: 4, wrongAnswers: 2, status: 'eliminado', date: '' },
     ];
     setRoomPlayers(mockPlayers);
-  }, [navigate]);
+  }, [navigate, isHost]);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    }
+  };
 
   const handleAnswer = (selectedIndex: number) => {
     if (isSpectator) return;
@@ -79,7 +97,6 @@ const Game = () => {
         isGameOver: isWinner
       }));
     } else {
-      // Lógica de Eliminação
       if (state.currentQuestionIndex < 2 || currentQ.isMaldade || state.showProfessorTrick) {
         showError("Você foi ELIMINADO! Mas pode continuar assistindo.");
         setIsSpectator(true);
@@ -133,7 +150,8 @@ const Game = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 p-4">
+    <div className="min-h-screen flex flex-col bg-slate-950 p-4 overflow-hidden">
+      {/* Header simplificado para o Host */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <div className="bg-blue-600 p-2 rounded-lg">
@@ -141,13 +159,19 @@ const Game = () => {
           </div>
           <span className="text-white font-black italic">SALA: {roomCode || 'LOCAL'}</span>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={() => setShowRanking(!showRanking)}
-          className="border-yellow-600 text-yellow-500 font-black rounded-xl"
-        >
-          <Trophy className="mr-2" size={18} /> RANKING
-        </Button>
+        
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={toggleFullscreen} className="text-blue-400">
+            {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setShowRanking(!showRanking)}
+            className="border-yellow-600 text-yellow-500 font-black rounded-xl"
+          >
+            <Trophy className="mr-2" size={18} /> RANKING
+          </Button>
+        </div>
       </div>
 
       {isSpectator && (
@@ -165,6 +189,13 @@ const Game = () => {
       />
 
       <div className="flex-1 flex flex-col justify-center items-center relative">
+        {/* Frase de efeito aleatória */}
+        <div className="mb-6 text-center animate-in fade-in slide-in-from-top duration-1000">
+          <p className="text-blue-400/60 text-[10px] font-bold uppercase tracking-[0.2em] italic">
+            "{MOTIVATIONAL_PHRASES[state.currentQuestionIndex % MOTIVATIONAL_PHRASES.length]}"
+          </p>
+        </div>
+
         {showRanking && (
           <div className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md p-6 rounded-[2rem] border-4 border-yellow-600 animate-in fade-in zoom-in duration-300">
             <div className="flex justify-between items-center mb-6">
