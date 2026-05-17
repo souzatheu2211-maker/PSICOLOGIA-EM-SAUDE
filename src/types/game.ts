@@ -6,7 +6,7 @@ export interface Question {
   options: string[];
   correctAnswer: number;
   difficulty: Difficulty;
-  explanation: string; // Justificativa da resposta
+  explanation: string;
   isBonus?: boolean;
   isMaldade?: boolean;
   hint?: string;
@@ -35,4 +35,5 @@ export interface GameState {
   selectedOption: number | null;
   showResult: boolean;
   roomStatus: 'waiting' | 'playing' | 'finished';
+  hiddenOptions: number[]; // Índices das opções escondidas pelo 50/50
 }
