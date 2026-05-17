@@ -16,12 +16,16 @@
   }
 
   body {
-    @apply bg-slate-950 text-white overflow-x-hidden;
+    @apply bg-slate-950 text-white overflow-x-hidden min-h-screen;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-image: url('/src/assets/fundo-psi.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-size: initial; /* Reset to default for titles */
+    font-size: initial;
   }
 }
 
@@ -31,7 +35,11 @@
   }
   
   .glass-dark {
-    @apply bg-black/40 backdrop-blur-lg border border-white/10 shadow-2xl;
+    @apply bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  .system-bg {
+    @apply min-h-screen bg-black/40 backdrop-blur-sm;
   }
 }
 
@@ -40,8 +48,12 @@
     animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
   }
   
-  .text-shadow-glow {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
 
@@ -52,7 +64,11 @@
   40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
-/* Estilo Game Show */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
 .game-button-shadow {
   box-shadow: 0 4px 0 rgb(30, 58, 138), 0 8px 15px rgba(0, 0, 0, 0.4);
 }

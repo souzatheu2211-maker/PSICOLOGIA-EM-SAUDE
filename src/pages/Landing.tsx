@@ -10,20 +10,21 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-center overflow-hidden relative">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-600/10 via-transparent to-transparent"></div>
-      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
-        <div className="absolute top-10 left-10 animate-pulse"><Brain size={100} /></div>
-        <div className="absolute bottom-20 right-20 animate-bounce duration-1000"><HeartPulse size={80} /></div>
-      </div>
-      
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
       <div className="relative z-10 max-w-4xl w-full flex flex-col items-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        {/* Logos Section */}
+        {/* Logos Section with Animation */}
         <div className="flex items-center justify-center gap-8 mb-6">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS Logo" className="h-20 md:h-24 object-contain drop-shadow-2xl" />
+          <img 
+            src="/src/assets/logo-fsss.png" 
+            alt="FSSS Logo" 
+            className="h-20 md:h-24 object-contain drop-shadow-2xl animate-float" 
+          />
           <div className="h-12 w-px bg-white/20"></div>
-          <img src="/src/assets/logo-enf.png" alt="Enfermagem Logo" className="h-20 md:h-24 object-contain drop-shadow-2xl" />
+          <img 
+            src="/src/assets/logo-enf.png" 
+            alt="Enfermagem Logo" 
+            className="h-20 md:h-24 object-contain drop-shadow-2xl animate-float [animation-delay:0.5s]" 
+          />
         </div>
 
         <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-200 via-blue-400 to-blue-700 italic uppercase tracking-tighter mb-1 drop-shadow-2xl">

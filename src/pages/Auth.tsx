@@ -25,9 +25,14 @@ const Auth = () => {
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        showSuccess("Bem-vindo de volta!");
-        navigate('/lobby');
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error("E-mail ou senha errados! O seu Superego está decepcionado com essa memória... kkkk");
+          }
+          throw error;
+        }
+        showSuccess("Acesso liberado! Seu Ego está pronto para o desafio! 🧠✨");
+        navigate('/home');
       } else {
         const { data, error } = await supabase.auth.signUp({ 
           email, 
@@ -44,7 +49,7 @@ const Auth = () => {
           });
         }
         
-        showSuccess("Cadastro realizado! Verifique seu email ou faça login.");
+        showSuccess("Registro concluído! Agora você é oficialmente um aspirante a mestre da mente! 🎓🔥");
         setIsLogin(true);
       }
     } catch (error: any) {
@@ -55,15 +60,12 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
       <div className="relative z-10 w-full max-w-md flex flex-col items-center">
-        {/* Logos */}
+        {/* Logos with Animation */}
         <div className="flex items-center gap-6 mb-4">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-14 object-contain" />
-          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-14 object-contain" />
+          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-14 object-contain animate-float" />
+          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-14 object-contain animate-float [animation-delay:0.3s]" />
         </div>
 
         <Card className="w-full glass-dark border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-500 mb-4">
@@ -93,10 +95,10 @@ const Auth = () => {
                 </div>
               )}
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Email Institucional</label>
+                <label className="text-[9px] font-bold text-blue-300 uppercase ml-1 tracking-wider">E-mail</label>
                 <Input 
                   type="email" 
-                  placeholder="exemplo@fsss.edu.br" 
+                  placeholder="seumail@gmail.com" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-white/5 border-white/10 text-white rounded-xl h-10 text-xs focus:ring-blue-500/50"
@@ -104,7 +106,7 @@ const Auth = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Senha de Acesso</label>
+                <label className="text-[9px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Senha</label>
                 <Input 
                   type="password" 
                   placeholder="••••••••" 
