@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Camera, Save, LogOut, Loader2, ArrowLeft, Mail } from 'lucide-react';
+import { Camera, Save, LogOut, Loader2, User } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
 import Footer from '@/components/Footer';
@@ -25,23 +25,60 @@ const Profile = () => {
   }, []);
 
   const fetchProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-      setProfile(data);
-      setName(data?.name || '');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+
+      if (data) {
+        setProfile(data);
+        setName(data.name || '');
+      }
+    } catch (error: any) {
+      console.error("Erro ao carregar perfil:", error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSave = async () => {
+    if (!name.trim()) {
+      showError("O nome não pode estar vazio!");
+      return;
+    }
+
     setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from('profiles').update({ name }).eq('id', user?.id);
-    
-    if (error) showError(error.message);
-    else showSuccess("Perfil atualizado com sucesso!");
-    setSaving(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          name: name.trim(),
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      
+      showSuccess("Perfil atualizado com sucesso! ✨");
+      await fetchProfile(); // Recarrega os dados
+    } catch (error: any) {
+      showError("Erro ao salvar: " + error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +86,6 @@ const Profile = () => {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      // 5MB Limit
       if (file.size > 5 * 1024 * 1024) {
         showError("A foto deve ter no máximo 5MB!");
         return;
@@ -57,7 +93,7 @@ const Profile = () => {
 
       setUploading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) throw new Error("Usuário não autenticado");
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
@@ -73,16 +109,20 @@ const Profile = () => {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      const { error: updateError } = await supabase.from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
+        });
 
       if (updateError) throw updateError;
 
       setProfile({ ...profile, avatar_url: publicUrl });
-      showSuccess("Foto de perfil atualizada!");
+      showSuccess("Foto de perfil atualizada! 📸");
     } catch (error: any) {
-      showError("Erro ao subir foto. Verifique as permissões do bucket.");
+      showError("Erro ao subir foto: " + error.message);
     } finally {
       setUploading(false);
     }
@@ -93,18 +133,22 @@ const Profile = () => {
     navigate('/');
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-blue-500" size={48} /></div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <Loader2 className="animate-spin text-blue-500" size={48} />
+    </div>
+  );
 
   return (
     <div className="min-h-screen p-6 flex flex-col items-center justify-center relative pb-32">
       <div className="w-full max-w-md flex flex-col items-center gap-6">
-        <Card className="w-full glass-dark border-blue-600/30 rounded-[3rem] shadow-2xl overflow-hidden">
+        <Card className="w-full glass-dark border-blue-600/30 rounded-[3rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-500">
           <CardHeader className="text-center pt-12">
             <div className="relative mx-auto w-40 h-40 mb-8">
               <Avatar className="w-full h-full border-4 border-blue-600 shadow-2xl">
                 <AvatarImage src={profile?.avatar_url} className="object-cover" />
                 <AvatarFallback className="bg-slate-800 text-4xl font-black text-blue-400">
-                  {name.substring(0, 2).toUpperCase()}
+                  <User size={60} />
                 </AvatarFallback>
               </Avatar>
               <button 
@@ -124,17 +168,8 @@ const Profile = () => {
               <Input 
                 value={name} 
                 onChange={(e) => setName(e.target.value)}
+                placeholder="Como quer ser chamado?"
                 className="bg-white/5 border-white/10 text-white rounded-2xl h-14 text-lg focus:ring-blue-500/50"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-blue-300 uppercase ml-1 tracking-widest flex items-center gap-1">
-                <Mail size={10} /> E-mail (Não alterável)
-              </label>
-              <Input 
-                value={profile?.email} 
-                disabled
-                className="bg-white/5 border-white/10 text-slate-500 rounded-2xl h-14 cursor-not-allowed opacity-50"
               />
             </div>
 
