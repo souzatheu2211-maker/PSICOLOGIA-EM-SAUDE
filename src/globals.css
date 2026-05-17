@@ -6,13 +6,42 @@
   :root {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-    --radius: 1rem;
+    --radius: 1.5rem;
+    --fsss-blue: 199 89% 48%;
+    --enf-green: 142 71% 45%;
+  }
+
+  html {
+    font-size: 12px;
+  }
+
+  body {
+    @apply bg-slate-950 text-white overflow-x-hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-size: initial; /* Reset to default for titles */
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-lg border border-white/10 shadow-2xl;
   }
 }
 
 @layer utilities {
   .animate-shake {
     animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  
+  .text-shadow-glow {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
 }
 
@@ -21,11 +50,6 @@
   20%, 80% { transform: translate3d(2px, 0, 0); }
   30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
   40%, 60% { transform: translate3d(4px, 0, 0); }
-}
-
-body {
-  @apply bg-slate-950 text-white overflow-x-hidden;
-  font-family: 'Inter', sans-serif;
 }
 
 /* Estilo Game Show */
