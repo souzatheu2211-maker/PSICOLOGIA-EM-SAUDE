@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Download, Plus, Loader2, Trash2, Upload } from 'lucide-react';
+import { FileText, Download, Loader2, Trash2, Upload } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 
 const Study = () => {

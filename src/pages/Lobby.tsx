@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Plus, LogIn, Sparkles, Sword, Lock } from 'lucide-react';
+import { Play, Plus, LogIn, Sparkles, Sword } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import Footer from '@/components/Footer';
 
@@ -30,10 +30,7 @@ const Lobby = () => {
   }, []);
 
   const createRoom = async () => {
-    if (!profile?.is_admin) {
-      showError("Apenas administradores podem criar salas!");
-      return;
-    }
+    if (!profile?.is_admin) return;
 
     setLoading(true);
     const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -48,7 +45,6 @@ const Lobby = () => {
     if (error) showError(error.message);
     else {
       showSuccess(`Sala criada! Código: ${newCode}`);
-      // Tenta colocar em tela cheia ao iniciar como host
       document.documentElement.requestFullscreen().catch(() => {});
       navigate(`/game?room=${newCode}&host=true`);
     }
@@ -88,33 +84,28 @@ const Lobby = () => {
           <p className="text-blue-300 font-bold italic text-sm">"A mente é um campo de batalha, e o Show do Milhão é o seu treinamento!"</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Criar Sala - Apenas Admin */}
-          <Card className="glass-dark border-blue-600/30 rounded-[2.5rem] overflow-hidden group hover:border-blue-500 transition-all relative">
-            {!profile?.is_admin && (
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center p-6 text-center">
-                <Lock className="text-blue-500 mb-2" size={32} />
-                <p className="text-white font-black uppercase text-xs">Acesso Restrito</p>
-                <p className="text-slate-400 text-[10px]">Apenas professores podem criar salas.</p>
-              </div>
-            )}
-            <CardHeader className="text-center pt-8">
-              <div className="mx-auto w-16 h-16 bg-green-600/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Plus className="text-green-500" size={32} />
-              </div>
-              <CardTitle className="text-white text-2xl font-black italic uppercase">Criar Sala</CardTitle>
-            </CardHeader>
-            <CardContent className="pb-10 px-8">
-              <p className="text-slate-400 text-sm mb-8 text-center">Inicie uma nova partida para toda a turma.</p>
-              <Button 
-                onClick={createRoom} 
-                disabled={loading || !profile?.is_admin}
-                className="w-full bg-green-600 hover:bg-green-500 h-14 font-black rounded-2xl shadow-lg shadow-green-900/20 transition-all active:scale-95"
-              >
-                CRIAR NOVA SALA
-              </Button>
-            </CardContent>
-          </Card>
+        <div className={profile?.is_admin ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "max-w-md mx-auto"}>
+          {/* Criar Sala - Visível apenas para Admin */}
+          {profile?.is_admin && (
+            <Card className="glass-dark border-blue-600/30 rounded-[2.5rem] overflow-hidden group hover:border-blue-500 transition-all">
+              <CardHeader className="text-center pt-8">
+                <div className="mx-auto w-16 h-16 bg-green-600/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Plus className="text-green-500" size={32} />
+                </div>
+                <CardTitle className="text-white text-2xl font-black italic uppercase">Criar Sala</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-10 px-8">
+                <p className="text-slate-400 text-sm mb-8 text-center">Inicie uma nova partida para toda a turma.</p>
+                <Button 
+                  onClick={createRoom} 
+                  disabled={loading}
+                  className="w-full bg-green-600 hover:bg-green-500 h-14 font-black rounded-2xl shadow-lg shadow-green-900/20 transition-all active:scale-95"
+                >
+                  CRIAR NOVA SALA
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Entrar na Sala */}
           <Card className="glass-dark border-blue-600/30 rounded-[2.5rem] overflow-hidden group hover:border-blue-500 transition-all">
