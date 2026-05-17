@@ -107,8 +107,6 @@ const Lobby = () => {
       showError(error.message);
     } finally {
       setLoading(false);
-} finally {
-      setLoading(false);
     }
   };
 
