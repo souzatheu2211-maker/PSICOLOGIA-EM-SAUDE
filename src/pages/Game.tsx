@@ -45,6 +45,41 @@ const Game = () => {
     questionStartedAt: null
   });
 
+  // Lógica Anti-Cheat: Elimina se sair da aba/fechar navegador
+  useEffect(() => {
+    if (isHost || state.roomStatus !== 'playing' || state.isGameOver || isSpectator) return;
+
+    const handleExit = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Marca como eliminado e remove da sala imediatamente
+        await supabase.from('profiles').update({ 
+          is_eliminated: true,
+          current_room_id: null 
+        }).eq('id', user.id);
+      }
+    };
+
+    // Detecta fechamento da aba ou recarregamento
+    window.addEventListener('beforeunload', handleExit);
+    
+    // Detecta se o usuário mudou de aba (opcional, mas agressivo contra pesquisa)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        handleExit();
+        showError("VOCÊ SAIU DA TELA E FOI ELIMINADO POR TENTATIVA DE TRAPAÇA!");
+        setIsSpectator(true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleExit);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isHost, state.roomStatus, state.isGameOver, isSpectator]);
+
   // Sincronização Realtime
   useEffect(() => {
     if (!roomCode) return;
@@ -113,7 +148,7 @@ const Game = () => {
     return () => { supabase.removeChannel(channel); };
   }, [roomCode]);
 
-  // Timer Sincronizado por Timestamp (Regra Principal)
+  // Timer Sincronizado por Timestamp
   useEffect(() => {
     if (state.roomStatus !== 'playing' || state.isGameOver || !state.questionStartedAt || state.showResult) return;
 
@@ -130,7 +165,6 @@ const Game = () => {
       }
     };
 
-    // Atualização frequente para suavidade (500ms)
     const timer = setInterval(calculateTime, 500);
     calculateTime();
 
@@ -211,7 +245,6 @@ const Game = () => {
           await supabase.from('rooms').update({ status: 'finished' }).eq('code', roomCode);
           setState(prev => ({ ...prev, isGameOver: true }));
         } else {
-          // Host atualiza o timestamp para a próxima pergunta
           await supabase.from('rooms').update({ 
             current_question_index: nextIndex,
             question_started_at: new Date().toISOString()
