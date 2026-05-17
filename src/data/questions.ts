@@ -11,7 +11,8 @@ export const QUESTIONS: Question[] = [
       "Um estado onde a pessoa não precisa de apoio emocional"
     ],
     correctAnswer: 1,
-    difficulty: 'fácil'
+    difficulty: 'fácil',
+    hint: "Pense na saúde como algo positivo e funcional, não apenas a falta de doença."
   },
   {
     id: 2,
@@ -23,7 +24,8 @@ export const QUESTIONS: Question[] = [
       "Falta de responsabilidade profissional"
     ],
     correctAnswer: 2,
-    difficulty: 'fácil'
+    difficulty: 'fácil',
+    hint: "O cansaço físico extremo costuma andar de mãos dadas com o mental."
   },
   {
     id: 3,
@@ -35,7 +37,8 @@ export const QUESTIONS: Question[] = [
       "Felicidade automática"
     ],
     correctAnswer: 2,
-    difficulty: 'fácil'
+    difficulty: 'fácil',
+    hint: "A empatia pode gerar um custo emocional alto."
   },
   {
     id: 4,
@@ -47,7 +50,8 @@ export const QUESTIONS: Question[] = [
       "A enfermagem se torna mais fácil"
     ],
     correctAnswer: 0,
-    difficulty: 'fácil'
+    difficulty: 'fácil',
+    hint: "Quem não está bem, dificilmente consegue cuidar bem do outro."
   },
   {
     id: 5,
@@ -60,7 +64,8 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 3,
     difficulty: 'fácil',
-    isBonus: true
+    isBonus: true,
+    hint: "Procure a opção que descreve algo saudável e relaxante."
   },
   {
     id: 6,
@@ -73,7 +78,8 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'médio',
-    isMaldade: true
+    isMaldade: true,
+    hint: "É algo tóxico, persistente e que visa diminuir o outro."
   },
   {
     id: 7,
@@ -85,7 +91,8 @@ export const QUESTIONS: Question[] = [
       "Porque os profissionais trabalham sozinhos"
     ],
     correctAnswer: 2,
-    difficulty: 'médio'
+    difficulty: 'médio',
+    hint: "Hospitais são lugares de decisões rápidas e vida ou morte."
   },
   {
     id: 8,
@@ -97,7 +104,8 @@ export const QUESTIONS: Question[] = [
       "Trabalhar apenas em horário comercial"
     ],
     correctAnswer: 2,
-    difficulty: 'médio'
+    difficulty: 'médio',
+    hint: "É quando a demanda é muito maior que a capacidade humana de atender."
   },
   {
     id: 9,
@@ -109,7 +117,8 @@ export const QUESTIONS: Question[] = [
       "Sonambulismo"
     ],
     correctAnswer: 0,
-    difficulty: 'médio'
+    difficulty: 'médio',
+    hint: "O termo em inglês significa 'queimar-se por completo'."
   },
   {
     id: 10,
@@ -122,7 +131,8 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'médio',
-    isBonus: true
+    isBonus: true,
+    hint: "A depressão profunda retira a esperança e o sentido da vida."
   },
   {
     id: 11,
@@ -134,7 +144,8 @@ export const QUESTIONS: Question[] = [
       "Só acontece durante provas"
     ],
     correctAnswer: 2,
-    difficulty: 'difícil'
+    difficulty: 'difícil',
+    hint: "Diferente do medo normal, ela é desproporcional e paralisante."
   },
   {
     id: 12,
@@ -146,7 +157,8 @@ export const QUESTIONS: Question[] = [
       "Eliminação da ansiedade"
     ],
     correctAnswer: 1,
-    difficulty: 'difícil'
+    difficulty: 'difícil',
+    hint: "A instabilidade gera insegurança e medo do futuro."
   },
   {
     id: 13,
@@ -158,7 +170,8 @@ export const QUESTIONS: Question[] = [
       "Melhorar o desempenho geral do hospital"
     ],
     correctAnswer: 1,
-    difficulty: 'difícil'
+    difficulty: 'difícil',
+    hint: "É uma relação de poder onde um tenta anular a mente do outro."
   },
   {
     id: 14,
@@ -170,7 +183,8 @@ export const QUESTIONS: Question[] = [
       "Aumento automático da memória"
     ],
     correctAnswer: 0,
-    difficulty: 'difícil'
+    difficulty: 'difícil',
+    hint: "O corpo reage como se estivesse em perigo iminente (luta ou fuga)."
   },
   {
     id: 15,
@@ -183,7 +197,8 @@ export const QUESTIONS: Question[] = [
     ],
     correctAnswer: 2,
     difficulty: 'difícil',
-    isBonus: true
+    isBonus: true,
+    hint: "Profissionais saudáveis salvam mais vidas."
   }
 ];
 
@@ -197,7 +212,8 @@ export const PROFESSOR_TRICK: Question = {
     "Moacir Lima de Andrade"
   ],
   correctAnswer: 0,
-  difficulty: 'difícil'
+  difficulty: 'difícil',
+  hint: "Lembre-se da chamada ou do plano de ensino!"
 };
 
 export const MOTIVATIONAL_PHRASES = [
