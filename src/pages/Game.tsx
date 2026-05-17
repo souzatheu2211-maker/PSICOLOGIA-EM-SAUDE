@@ -62,7 +62,7 @@ const Game = () => {
           name: p.name,
           avatar_url: p.avatar_url,
           score: p.current_score,
-          is_eliminated: p.is_eliminated
+          is_eliminated: p.is_ewetw4liminated
         })));
       }
     };
