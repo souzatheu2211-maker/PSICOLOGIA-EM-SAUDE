@@ -33,22 +33,34 @@ const Lobby = () => {
     if (!profile?.is_admin) return;
 
     setLoading(true);
-    const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { error } = await supabase.from('rooms').insert({
-      code: newCode,
-      host_id: user?.id,
-      status: 'waiting'
-    });
+    try {
+      const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase.from('rooms').insert({
+        code: newCode,
+        host_id: user?.id,
+        status: 'waiting'
+      });
 
-    if (error) showError(error.message);
-    else {
+      if (error) throw error;
+
+      // Salva o nome do admin para o jogo reconhecer
+      localStorage.setItem('currentPlayer', profile.name || 'Professor');
+      
       showSuccess(`Sala criada! Código: ${newCode}`);
-      document.documentElement.requestFullscreen().catch(() => {});
+      
+      // Tenta colocar em tela cheia
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+      
       navigate(`/game?room=${newCode}&host=true`);
+    } catch (error: any) {
+      showError(error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleJoinClick = () => {
@@ -61,16 +73,21 @@ const Lobby = () => {
 
   const joinRoom = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('rooms').select('*').eq('code', code.toUpperCase()).single();
-    
-    if (error || !data) {
-      showError("Sala não encontrada! Verifique o código.");
-    } else {
+    try {
+      const { data, error } = await supabase.from('rooms').select('*').eq('code', code.toUpperCase()).single();
+      
+      if (error || !data) {
+        throw new Error("Sala não encontrada! Verifique o código.");
+      }
+
       const finalName = warName.trim() || profile?.name || 'Anônimo';
       localStorage.setItem('currentPlayer', finalName);
       navigate(`/game?room=${data.code}`);
+    } catch (error: any) {
+      showError(error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
