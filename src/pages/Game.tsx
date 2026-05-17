@@ -113,24 +113,25 @@ const Game = () => {
     return () => { supabase.removeChannel(channel); };
   }, [roomCode]);
 
-  // Timer Sincronizado por Timestamp
+  // Timer Sincronizado por Timestamp (Regra Principal)
   useEffect(() => {
     if (state.roomStatus !== 'playing' || state.isGameOver || !state.questionStartedAt || state.showResult) return;
 
     const calculateTime = () => {
       const startedAt = new Date(state.questionStartedAt!).getTime();
-      const now = new Date().getTime();
-      const diff = Math.floor((now - startedAt) / 1000);
-      const remaining = Math.max(0, 30 - diff);
+      const now = Date.now();
+      const elapsed = (now - startedAt) / 1000;
+      const remaining = Math.max(0, 30 - elapsed);
       
-      setState(prev => ({ ...prev, timeLeft: remaining }));
+      setState(prev => ({ ...prev, timeLeft: Math.floor(remaining) }));
 
-      if (remaining === 0) {
+      if (remaining <= 0) {
         handleTimeUp();
       }
     };
 
-    const timer = setInterval(calculateTime, 1000);
+    // Atualização frequente para suavidade (500ms)
+    const timer = setInterval(calculateTime, 500);
     calculateTime();
 
     return () => clearInterval(timer);
@@ -154,7 +155,6 @@ const Game = () => {
       let shouldEliminate = false;
       let pointsChange = 0;
 
-      // Lógica de Pontuação e Penalidade
       const basePoints = currentQ.difficulty === 'fácil' ? 10 : currentQ.difficulty === 'médio' ? 20 : 40;
       const multiplier = currentQ.isBonus ? 2 : 1;
       const totalPoints = basePoints * multiplier;
@@ -165,15 +165,14 @@ const Game = () => {
       } else {
         pointsChange = -totalPoints;
         
-        // Regras de Eliminação
         if (state.currentQuestionIndex < 3) shouldEliminate = true;
         if (currentQ.isMaldade) {
           shouldEliminate = true;
-          pointsChange = -20; // Penalidade fixa da maldade
+          pointsChange = -20;
         }
         if (state.currentQuestionIndex === 999) {
           shouldEliminate = true;
-          pointsChange = -20; // Penalidade fixa do professor
+          pointsChange = -20;
         }
         if (currentQ.difficulty === 'difícil') shouldEliminate = true;
         if (noAnswer) shouldEliminate = true;
@@ -198,7 +197,6 @@ const Game = () => {
       }
     }
 
-    // Host gerencia a transição de perguntas
     if (isHost) {
       setTimeout(async () => {
         let nextIndex = state.currentQuestionIndex + 1;
@@ -213,6 +211,7 @@ const Game = () => {
           await supabase.from('rooms').update({ status: 'finished' }).eq('code', roomCode);
           setState(prev => ({ ...prev, isGameOver: true }));
         } else {
+          // Host atualiza o timestamp para a próxima pergunta
           await supabase.from('rooms').update({ 
             current_question_index: nextIndex,
             question_started_at: new Date().toISOString()
@@ -329,7 +328,6 @@ const Game = () => {
             <div className="w-full space-y-6">
               <ScoreBoard score={state.score} current={state.currentQuestionIndex === 999 ? 10 : state.currentQuestionIndex + 1} total={QUESTIONS.length} playerName={playerName} />
               
-              {/* Alerta de Pergunta Eliminatória */}
               {isEliminatory && (
                 <div className="bg-red-600/20 border-2 border-red-600 p-4 rounded-2xl flex items-center justify-center gap-3 animate-pulse">
                   <AlertTriangle className="text-red-500" />

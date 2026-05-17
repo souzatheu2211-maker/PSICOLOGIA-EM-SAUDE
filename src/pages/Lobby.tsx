@@ -43,7 +43,8 @@ const Lobby = () => {
         code: newCode,
         host_id: user?.id,
         status: 'waiting',
-        current_question_index: 0
+        current_question_index: 0,
+        question_started_at: null // Inicializa como null até o jogo começar
       });
 
       if (roomError) throw roomError;
@@ -80,7 +81,6 @@ const Lobby = () => {
       if (error || !room) throw new Error("Sala não encontrada!");
       if (room.status !== 'waiting') throw new Error("A partida já começou!");
 
-      // Verificar limite de 50 jogadores
       const { count } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
