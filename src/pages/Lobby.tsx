@@ -39,13 +39,24 @@ const Lobby = () => {
       
       const { data: { user } } = await supabase.auth.getUser();
       
-      const { error } = await supabase.from('rooms').insert({
+      // Cria a sala
+      const { error: roomError } = await supabase.from('rooms').insert({
         code: newCode,
         host_id: user?.id,
         status: 'waiting'
       });
 
-      if (error) throw error;
+      if (roomError) throw roomError;
+
+      // Adiciona o host à sala como jogador também
+      if (user) {
+        await supabase.from('profiles').update({ 
+          current_room_id: newCode,
+          current_score: 0,
+          is_eliminated: false,
+          name: warName || profile.name || 'Professor'
+        }).eq('id', user.id);
+      }
 
       localStorage.setItem('currentPlayer', warName || profile.name || 'Professor');
       showSuccess(`Sala criada! Código: ${newCode}`);
@@ -64,10 +75,6 @@ const Lobby = () => {
     }
     if (!warName.trim()) {
       showError("O Nome de Guerra é obrigatório!");
-      return;
-    }
-    if (!code.toUpperCase().startsWith('PSI')) {
-      showError("O código deve começar com PSI!");
       return;
     }
 
@@ -99,6 +106,8 @@ const Lobby = () => {
     } catch (error: any) {
       showError(error.message);
     } finally {
+      setLoading(false);
+} finally {
       setLoading(false);
     }
   };

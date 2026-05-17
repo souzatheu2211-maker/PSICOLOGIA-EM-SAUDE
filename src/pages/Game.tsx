@@ -11,7 +11,7 @@ import RankingSidebar from '@/components/Game/RankingSidebar';
 import TVView from '@/components/Game/TVView';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
-import { Users, Play, Sparkles, Timer as TimerIcon, Info, BrainCircuit, Trophy } from 'lucide-react';
+import { Users, Play, Sparkles, Timer as TimerIcon, Info, BrainCircuit, Trophy, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { Progress } from '@/components/ui/progress';
@@ -254,17 +254,26 @@ const Game = () => {
               <p className="text-white font-black text-2xl italic tracking-tighter">{roomCode}</p>
             </div>
           </div>
-          {state.roomStatus === 'playing' && (
-            <div className="text-center">
-              <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Tempo Restante</p>
-              <div className={cn(
-                "flex items-center gap-3 font-black text-4xl italic transition-all duration-300", 
-                state.timeLeft <= 5 ? "text-red-500 scale-110 animate-pulse" : "text-white"
-              )}>
-                <TimerIcon size={28} /> {state.timeLeft}s
-              </div>
+          
+          <div className="flex items-center gap-6">
+            <div className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2">
+              <UserCheck className="text-green-400" size={18} />
+              <span className="text-white font-black text-lg">{roomPlayers.length}</span>
+              <span className="text-[10px] font-bold text-blue-300 uppercase">Online</span>
             </div>
-          )}
+
+            {state.roomStatus === 'playing' && (
+              <div className="text-center">
+                <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Tempo Restante</p>
+                <div className={cn(
+                  "flex items-center gap-3 font-black text-4xl italic transition-all duration-300", 
+                  state.timeLeft <= 5 ? "text-red-500 scale-110 animate-pulse" : "text-white"
+                )}>
+                  <TimerIcon size={28} /> {state.timeLeft}s
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col justify-center items-center max-w-5xl mx-auto w-full py-4">
@@ -280,12 +289,15 @@ const Game = () => {
               </div>
               
               {isHost ? (
-                <Button 
-                  onClick={startGame} 
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 h-24 text-3xl font-black rounded-[2.5rem] shadow-2xl shadow-green-900/40 transition-all active:scale-95 group"
-                >
-                  <Play className="mr-4 group-hover:scale-125 transition-transform" size={40} /> INICIAR PARTIDA
-                </Button>
+                <div className="space-y-6">
+                  <Button 
+                    onClick={startGame} 
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 h-24 text-3xl font-black rounded-[2.5rem] shadow-2xl shadow-green-900/40 transition-all active:scale-95 group"
+                  >
+                    <Play className="mr-4 group-hover:scale-125 transition-transform" size={40} /> INICIAR PARTIDA
+                  </Button>
+                  <p className="text-blue-300 font-bold italic">Você pode iniciar mesmo sozinho para testar!</p>
+                </div>
               ) : (
                 <div className="flex flex-col items-center gap-4">
                   <div className="flex items-center gap-3 text-blue-400 animate-pulse">
