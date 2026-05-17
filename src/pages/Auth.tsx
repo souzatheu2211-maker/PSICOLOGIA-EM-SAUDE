@@ -59,58 +59,58 @@ const Auth = () => {
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="relative z-10 w-full max-w-md flex flex-col items-center gap-8">
-        {/* Logos - Increased sizes */}
-        <div className="flex items-center gap-8 mb-2">
-          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-16 md:h-20 object-contain" />
-          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-16 md:h-20 object-contain" />
+      <div className="relative z-10 w-full max-w-md flex flex-col items-center">
+        {/* Logos */}
+        <div className="flex items-center gap-6 mb-4">
+          <img src="/src/assets/logo-fsss.png" alt="FSSS" className="h-14 object-contain" />
+          <img src="/src/assets/logo-enf.png" alt="ENF" className="h-14 object-contain" />
         </div>
 
-        <Card className="w-full glass-dark border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-500">
-          <CardHeader className="text-center pt-10">
-            <div className="mx-auto w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center mb-4">
-              <BrainCircuit className="text-blue-400 animate-pulse" size={32} />
+        <Card className="w-full glass-dark border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-500 mb-4">
+          <CardHeader className="text-center pt-6 pb-4">
+            <div className="mx-auto w-12 h-12 bg-blue-600/20 rounded-xl flex items-center justify-center mb-2">
+              <BrainCircuit className="text-blue-400 animate-pulse" size={24} />
             </div>
-            <CardTitle className="text-3xl font-black text-white italic uppercase tracking-tight">
+            <CardTitle className="text-2xl font-black text-white italic uppercase tracking-tight">
               {isLogin ? 'Acessar Portal' : 'Criar Registro'}
             </CardTitle>
-            <CardDescription className="text-blue-300/70 text-xs font-medium">
+            <CardDescription className="text-blue-300/70 text-[10px] font-medium">
               {isLogin ? 'Entre para continuar seus estudos' : 'Junte-se à comunidade acadêmica'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pb-10 px-8">
-            <form onSubmit={handleAuth} className="space-y-5">
+          <CardContent className="pb-8 px-8">
+            <form onSubmit={handleAuth} className="space-y-4">
               {!isLogin && (
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Nome Completo</label>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Nome Completo</label>
                   <Input 
                     placeholder="Seu nome acadêmico" 
                     value={name} 
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-white/5 border-white/10 text-white rounded-2xl h-11 focus:ring-blue-500/50"
+                    className="bg-white/5 border-white/10 text-white rounded-xl h-10 text-xs focus:ring-blue-500/50"
                     required
                   />
                 </div>
               )}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Email Institucional</label>
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Email Institucional</label>
                 <Input 
                   type="email" 
                   placeholder="exemplo@fsss.edu.br" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white/5 border-white/10 text-white rounded-2xl h-11 focus:ring-blue-500/50"
+                  className="bg-white/5 border-white/10 text-white rounded-xl h-10 text-xs focus:ring-blue-500/50"
                   required
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Senha de Acesso</label>
+              <div className="space-y-1">
+                <label className="text-[9px] font-bold text-blue-300 uppercase ml-1 tracking-wider">Senha de Acesso</label>
                 <Input 
                   type="password" 
                   placeholder="••••••••" 
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-white/5 border-white/10 text-white rounded-2xl h-11 focus:ring-blue-500/50"
+                  className="bg-white/5 border-white/10 text-white rounded-xl h-10 text-xs focus:ring-blue-500/50"
                   required
                 />
               </div>
@@ -118,17 +118,17 @@ const Auth = () => {
               <Button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 h-12 text-sm font-black rounded-2xl shadow-lg shadow-blue-900/20 transition-all active:scale-95 mt-4"
+                className="w-full bg-blue-600 hover:bg-blue-500 h-11 text-xs font-black rounded-xl shadow-lg shadow-blue-900/20 transition-all active:scale-95 mt-2"
               >
-                {loading ? <Loader2 className="animate-spin" /> : (isLogin ? <LogIn className="mr-2" size={18} /> : <UserPlus className="mr-2" size={18} />)}
+                {loading ? <Loader2 className="animate-spin" /> : (isLogin ? <LogIn className="mr-2" size={16} /> : <UserPlus className="mr-2" size={16} />)}
                 {isLogin ? 'ENTRAR NO SISTEMA' : 'FINALIZAR CADASTRO'}
               </Button>
 
-              <div className="text-center mt-6">
+              <div className="text-center mt-4">
                 <button 
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-blue-400/80 text-[11px] hover:text-blue-300 transition-colors font-bold uppercase tracking-tighter"
+                  className="text-blue-400/80 text-[10px] hover:text-blue-300 transition-colors font-bold uppercase tracking-tighter"
                 >
                   {isLogin ? 'Ainda não tem conta? Registre-se' : 'Já possui registro? Faça login'}
                 </button>

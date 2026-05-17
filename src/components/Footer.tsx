@@ -5,20 +5,20 @@ import { Instagram } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="w-full py-6 mt-auto flex flex-col items-center gap-2 text-slate-400">
+    <footer className="w-full py-4 mt-4 flex flex-col items-center gap-1.5 text-slate-400">
       <div className="flex flex-col items-center text-center">
-        <p className="font-medium text-xs uppercase tracking-widest">Desenvolvido por Matheus Souza</p>
-        <p className="font-bold text-blue-400 text-[10px]">ENFERMAGEM - FSSS</p>
-        <p className="text-[9px] mt-1 opacity-60">© 2026 Todos os direitos reservados.</p>
+        <p className="font-medium text-[10px] uppercase tracking-widest">Desenvolvido por Matheus Souza</p>
+        <p className="font-bold text-blue-400 text-[9px]">ENFERMAGEM - FSSS</p>
+        <p className="text-[8px] opacity-60">© 2026 Todos os direitos reservados.</p>
       </div>
       <a 
         href="https://www.instagram.com/theu_souz2?igsh=NXhiejZ0OTh1cHd5&utm_source=qr" 
         target="_blank" 
         rel="noopener noreferrer"
-        className="flex items-center gap-2 hover:text-pink-500 transition-colors group"
+        className="flex items-center gap-1.5 hover:text-pink-500 transition-colors group"
       >
-        <Instagram size={16} className="group-hover:scale-110 transition-transform" />
-        <span className="text-xs font-semibold">@theu_souz2</span>
+        <Instagram size={14} className="group-hover:scale-110 transition-transform" />
+        <span className="text-[10px] font-semibold">@theu_souz2</span>
       </a>
     </footer>
   );
