@@ -51,7 +51,7 @@ const Game = () => {
       const { data: room } = await supabase.from('rooms').select('status').eq('code', roomCode).single();
       if (room) setState(prev => ({ ...prev, roomStatus: room.status }));
 
-      consgawgt { data: players } = await supabase
+      const { data: players } = await supabase
         .from('profiles')
         .select('id, name, avatar_url, current_score, is_eliminated')
         .eq('current_room_id', roomCode);
