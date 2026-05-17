@@ -11,7 +11,7 @@ import RankingSidebar from '@/components/Game/RankingSidebar';
 import TVView from '@/components/Game/TVView';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
-import { Users, Play, Sparkles, Timer as TimerIcon, Info, BrainCircuit, Trophy, UserCheck } from 'lucide-react';
+import { Users, Play, Sparkles, Timer as TimerIcon, Info, BrainCircuit, Trophy, UserCheck, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { Progress } from '@/components/ui/progress';
@@ -26,6 +26,7 @@ const Game = () => {
   const isMobile = useIsMobile();
   
   const [playerName, setPlayerName] = useState('');
+  const [hostId, setHostId] = useState<string | undefined>(undefined);
   const [isSpectator, setIsSpectator] = useState(false);
   const [roomPlayers, setRoomPlayers] = useState<Player[]>([]);
   const [probabilities, setProbabilities] = useState<number[]>([]);
@@ -49,8 +50,11 @@ const Game = () => {
     if (!roomCode) return;
 
     const fetchRoomData = async () => {
-      const { data: room } = await supabase.from('rooms').select('status').eq('code', roomCode).single();
-      if (room) setState(prev => ({ ...prev, roomStatus: room.status }));
+      const { data: room } = await supabase.from('rooms').select('status, host_id').eq('code', roomCode).single();
+      if (room) {
+        setState(prev => ({ ...prev, roomStatus: room.status }));
+        setHostId(room.host_id);
+      }
 
       const { data: players } = await supabase
         .from('profiles')
@@ -184,6 +188,16 @@ const Game = () => {
       .eq('current_room_id', roomCode);
   };
 
+  const exitArena = async () => {
+    if (confirm("Deseja realmente sair da arena? Seu progresso nesta partida será perdido.")) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').update({ current_room_id: null }).eq('id', user.id);
+      }
+      navigate('/home');
+    }
+  };
+
   const useAid = (type: 'fiftyFifty' | 'hint' | 'probabilities') => {
     if (state.aidsUsed[type] || usedAidThisTurn || isSpectator || isHost) return;
     const currentQ = QUESTIONS[state.currentQuestionIndex];
@@ -255,7 +269,7 @@ const Game = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <div className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2">
               <UserCheck className="text-green-400" size={18} />
               <span className="text-white font-black text-lg">{roomPlayers.length}</span>
@@ -264,7 +278,7 @@ const Game = () => {
 
             {state.roomStatus === 'playing' && (
               <div className="text-center">
-                <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Tempo Restante</p>
+                <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.3em]">Tempo</p>
                 <div className={cn(
                   "flex items-center gap-3 font-black text-4xl italic transition-all duration-300", 
                   state.timeLeft <= 5 ? "text-red-500 scale-110 animate-pulse" : "text-white"
@@ -273,6 +287,14 @@ const Game = () => {
                 </div>
               </div>
             )}
+
+            <Button 
+              variant="outline" 
+              onClick={exitArena}
+              className="border-red-900/50 text-red-500 hover:bg-red-900/20 h-12 rounded-2xl font-black text-xs"
+            >
+              <LogOut size={16} className="mr-2" /> SAIR
+            </Button>
           </div>
         </div>
 
@@ -350,7 +372,7 @@ const Game = () => {
       {/* Ranking Sidebar - Hidden on mobile, visible on large screens */}
       {!isMobile && (
         <div className="w-96 h-full border-l border-white/10">
-          <RankingSidebar players={roomPlayers} />
+          <RankingSidebar players={roomPlayers} hostId={hostId} />
         </div>
       )}
     </div>

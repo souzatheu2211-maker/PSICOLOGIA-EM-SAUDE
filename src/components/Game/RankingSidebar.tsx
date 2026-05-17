@@ -4,14 +4,15 @@ import React from 'react';
 import { Player } from '@/types/game';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { Trophy, Skull } from 'lucide-react';
+import { Trophy, Skull, Crown } from 'lucide-react';
 
 interface RankingSidebarProps {
   players: Player[];
   compact?: boolean;
+  hostId?: string;
 }
 
-const RankingSidebar = ({ players, compact }: RankingSidebarProps) => {
+const RankingSidebar = ({ players, compact, hostId }: RankingSidebarProps) => {
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
   return (
@@ -54,12 +55,20 @@ const RankingSidebar = ({ players, compact }: RankingSidebarProps) => {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className={cn(
-                "font-bold text-sm truncate",
-                player.is_eliminated ? "text-red-400" : "text-white"
-              )}>
-                {player.name}
-              </p>
+              <div className="flex items-center gap-1.5">
+                <p className={cn(
+                  "font-bold text-sm truncate",
+                  player.is_eliminated ? "text-red-400" : "text-white"
+                )}>
+                  {player.name}
+                </p>
+                {player.id === hostId && (
+                  <div className="bg-yellow-500/20 text-yellow-500 p-0.5 rounded flex items-center gap-0.5">
+                    <Crown size={10} />
+                    <span className="text-[8px] font-black uppercase">HOST</span>
+                  </div>
+                )}
+              </div>
               <p className="text-yellow-500 font-black text-xs">{player.score} <span className="text-[8px] opacity-60">PTS</span></p>
             </div>
           </div>

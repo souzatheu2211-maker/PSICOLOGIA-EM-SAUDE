@@ -1,13 +1,24 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Brain, HeartPulse, Sparkles, Coffee } from 'lucide-react';
 import Footer from '@/components/Footer';
 
 const Landing = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/home');
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
