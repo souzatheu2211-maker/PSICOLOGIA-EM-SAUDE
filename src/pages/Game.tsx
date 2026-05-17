@@ -10,12 +10,13 @@ import Aids from '@/components/Game/Aids';
 import RankingSidebar from '@/components/Game/RankingSidebar';
 import TVView from '@/components/Game/TVView';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { showSuccess, showError } from '@/utils/toast';
 import { supabase } from '@/lib/supabase';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Timer as TimerIcon, LogOut, Play, BrainCircuit, Sparkles, Trophy, AlertTriangle } from 'lucide-react';
+import { Timer as TimerIcon, LogOut, Play, BrainCircuit, Sparkles, Trophy, AlertTriangle, Crown, Medal, Home } from 'lucide-react';
 
 const Game = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ const Game = () => {
 
     window.addEventListener('beforeunload', handleExit);
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
+      if (document.visibilityState === 'hidden' && stateRef.current.roomStatus === 'playing' && !stateRef.current.showResult) {
         handleExit();
         showError("VOCÊ SAIU DA TELA E FOI ELIMINADO POR TENTATIVA DE TRAPAÇA!");
         setIsSpectator(true);
@@ -92,7 +93,8 @@ const Game = () => {
           ...prev, 
           roomStatus: room.status,
           currentQuestionIndex: room.current_question_index,
-          questionStartedAt: room.question_started_at
+          questionStartedAt: room.question_started_at,
+          isGameOver: room.status === 'finished'
         }));
         setHostId(room.host_id);
       }
@@ -129,6 +131,7 @@ const Game = () => {
           roomStatus: newRoom.status,
           currentQuestionIndex: newRoom.current_question_index,
           questionStartedAt: newRoom.question_started_at,
+          isGameOver: newRoom.status === 'finished',
           showResult: false,
           selectedOption: null,
           hiddenOptions: []
@@ -178,7 +181,6 @@ const Game = () => {
       } else {
         pointsChange = -totalPoints;
         
-        // Lógica de Eliminação: 1-5 (index 0-4), Maldade, Professor, Difíceis ou Sem Resposta
         if (stateRef.current.currentQuestionIndex < 5) shouldEliminate = true;
         if (currentQ.isMaldade) shouldEliminate = true;
         if (stateRef.current.currentQuestionIndex === 999) shouldEliminate = true;
@@ -209,7 +211,6 @@ const Game = () => {
       setTimeout(async () => {
         let nextIndex = stateRef.current.currentQuestionIndex + 1;
         
-        // Pegadinha do Professor após a questão 8 (index 7)
         if (stateRef.current.currentQuestionIndex === 7) {
           nextIndex = 999;
         } else if (stateRef.current.currentQuestionIndex === 999) {
@@ -218,7 +219,6 @@ const Game = () => {
 
         if (nextIndex >= QUESTIONS.length && stateRef.current.currentQuestionIndex !== 999) {
           await supabase.from('rooms').update({ status: 'finished' }).eq('code', roomCode);
-          setState(prev => ({ ...prev, isGameOver: true }));
         } else {
           await supabase.from('rooms').update({ 
             current_question_index: nextIndex,
@@ -281,6 +281,8 @@ const Game = () => {
     setUsedAidThisTurn(true);
   };
 
+  const sortedWinners = [...roomPlayers].sort((a, b) => b.score - a.score).slice(0, 3);
+
   if (isHost && state.roomStatus === 'playing' && !state.isGameOver) {
     return (
       <TVView 
@@ -301,30 +303,33 @@ const Game = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 overflow-hidden">
       <div className="flex-1 flex flex-col p-6 relative overflow-y-auto custom-scrollbar">
-        <div className="flex justify-between items-center mb-8 glass-dark p-6 rounded-[2.5rem] border-2 border-white/10">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-2xl"><BrainCircuit size={24} className="text-white" /></div>
-            <div>
-              <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Sala: {roomCode}</p>
-              <p className="text-white font-black text-xl italic">{playerName}</p>
-            </div>
-          </div>
-          
-          {state.roomStatus === 'playing' && (
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <p className="text-[10px] font-black text-yellow-500 uppercase tracking-widest">Tempo</p>
-                <div className={cn("flex items-center gap-2 font-black text-3xl italic", state.timeLeft <= 5 ? "text-red-500 animate-pulse" : "text-white")}>
-                  <TimerIcon size={24} /> {state.timeLeft}s
-                </div>
+        {/* Header (Oculto no Game Over) */}
+        {!state.isGameOver && (
+          <div className="flex justify-between items-center mb-8 glass-dark p-6 rounded-[2.5rem] border-2 border-white/10">
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-600 p-3 rounded-2xl"><BrainCircuit size={24} className="text-white" /></div>
+              <div>
+                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Sala: {roomCode}</p>
+                <p className="text-white font-black text-xl italic">{playerName}</p>
               </div>
             </div>
-          )}
+            
+            {state.roomStatus === 'playing' && (
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <p className="text-[10px] font-black text-yellow-500 uppercase tracking-widest">Tempo</p>
+                  <div className={cn("flex items-center gap-2 font-black text-3xl italic", state.timeLeft <= 5 ? "text-red-500 animate-pulse" : "text-white")}>
+                    <TimerIcon size={24} /> {state.timeLeft}s
+                  </div>
+                </div>
+              </div>
+            )}
 
-          <Button variant="outline" onClick={() => navigate('/home')} className="border-red-900/50 text-red-500 h-12 rounded-2xl font-black">
-            <LogOut size={16} className="mr-2" /> SAIR
-          </Button>
-        </div>
+            <Button variant="outline" onClick={() => navigate('/home')} className="border-red-900/50 text-red-500 h-12 rounded-2xl font-black">
+              <LogOut size={16} className="mr-2" /> SAIR
+            </Button>
+          </div>
+        )}
 
         <div className="flex-1 flex flex-col justify-center items-center max-w-5xl mx-auto w-full">
           {state.roomStatus === 'waiting' ? (
@@ -341,11 +346,92 @@ const Game = () => {
               )}
             </div>
           ) : state.isGameOver ? (
-            <div className="text-center glass-dark p-16 rounded-[4rem] border-8 border-blue-600">
-              <Trophy className="text-yellow-500 mx-auto mb-8" size={100} />
-              <h2 className="text-6xl font-black text-white italic uppercase mb-4">Fim de Jogo!</h2>
-              <p className="text-4xl font-black text-yellow-400 mb-12">Pontuação Final: {state.score}</p>
-              <Button onClick={() => navigate('/home')} className="bg-blue-600 h-16 px-12 text-xl font-black rounded-2xl">VOLTAR</Button>
+            <div className="w-full max-w-4xl animate-in zoom-in duration-700">
+              <div className="text-center mb-12">
+                <Trophy className="text-yellow-500 mx-auto mb-4 animate-bounce" size={80} />
+                <h2 className="text-6xl font-black text-white italic uppercase tracking-tighter">Pódio Final</h2>
+                <p className="text-blue-400 font-bold uppercase tracking-widest">Os mestres da Psicologia em Saúde</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end mb-16">
+                {/* Segundo Lugar */}
+                {sortedWinners[1] && (
+                  <div className="order-2 md:order-1 flex flex-col items-center gap-4 animate-in slide-in-from-bottom duration-1000 delay-200">
+                    <div className="relative">
+                      <Avatar className="w-32 h-32 border-4 border-slate-400 shadow-2xl">
+                        <AvatarImage src={sortedWinners[1].avatar_url} className="object-cover" />
+                        <AvatarFallback className="bg-slate-800 text-2xl font-black">{sortedWinners[1].name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-2 -right-2 bg-slate-400 p-2 rounded-full border-4 border-slate-900">
+                        <Medal className="text-slate-900" size={20} />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-slate-400 font-black text-xl truncate max-w-[150px]">{sortedWinners[1].name}</p>
+                      <p className="text-white font-black text-2xl">{sortedWinners[1].score} <span className="text-xs opacity-50">PTS</span></p>
+                    </div>
+                    <div className="w-full h-32 bg-slate-400/20 rounded-t-3xl border-t-4 border-slate-400 flex items-center justify-center">
+                      <span className="text-4xl font-black text-slate-400">2º</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Primeiro Lugar */}
+                {sortedWinners[0] && (
+                  <div className="order-1 md:order-2 flex flex-col items-center gap-6 animate-in slide-in-from-bottom duration-1000">
+                    <div className="relative">
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 animate-pulse">
+                        <Crown className="text-yellow-500" size={60} />
+                      </div>
+                      <Avatar className="w-48 h-48 border-8 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.4)]">
+                        <AvatarImage src={sortedWinners[0].avatar_url} className="object-cover" />
+                        <AvatarFallback className="bg-slate-800 text-4xl font-black">{sortedWinners[0].name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-4 -right-4 bg-yellow-500 p-4 rounded-full border-4 border-slate-900 shadow-xl">
+                        <Trophy className="text-slate-900" size={32} />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-yellow-500 font-black text-3xl italic tracking-tighter truncate max-w-[200px]">{sortedWinners[0].name}</p>
+                      <p className="text-white font-black text-4xl">{sortedWinners[0].score} <span className="text-sm opacity-50">PTS</span></p>
+                    </div>
+                    <div className="w-full h-48 bg-yellow-500/20 rounded-t-[3rem] border-t-8 border-yellow-500 flex items-center justify-center shadow-[0_-20px_50px_rgba(234,179,8,0.1)]">
+                      <span className="text-6xl font-black text-yellow-500">1º</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Terceiro Lugar */}
+                {sortedWinners[2] && (
+                  <div className="order-3 flex flex-col items-center gap-4 animate-in slide-in-from-bottom duration-1000 delay-500">
+                    <div className="relative">
+                      <Avatar className="w-28 h-28 border-4 border-amber-700 shadow-2xl">
+                        <AvatarImage src={sortedWinners[2].avatar_url} className="object-cover" />
+                        <AvatarFallback className="bg-slate-800 text-xl font-black">{sortedWinners[2].name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-2 -right-2 bg-amber-700 p-2 rounded-full border-4 border-slate-900">
+                        <Medal className="text-slate-900" size={18} />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-amber-700 font-black text-lg truncate max-w-[150px]">{sortedWinners[2].name}</p>
+                      <p className="text-white font-black text-xl">{sortedWinners[2].score} <span className="text-xs opacity-50">PTS</span></p>
+                    </div>
+                    <div className="w-full h-24 bg-amber-700/20 rounded-t-2xl border-t-4 border-amber-700 flex items-center justify-center">
+                      <span className="text-3xl font-black text-amber-700">3º</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-center gap-4">
+                <Button onClick={() => navigate('/home')} className="bg-blue-600 hover:bg-blue-500 h-16 px-12 text-xl font-black rounded-2xl shadow-xl transition-all hover:scale-105">
+                  <Home className="mr-2" /> VOLTAR AO INÍCIO
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/ranking')} className="border-yellow-600 text-yellow-500 h-16 px-12 text-xl font-black rounded-2xl hover:bg-yellow-600 hover:text-white">
+                  <Trophy className="mr-2" /> VER RANKING GERAL
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="w-full space-y-6">
@@ -383,7 +469,7 @@ const Game = () => {
         </div>
       </div>
 
-      {!isMobile && (
+      {!isMobile && !state.isGameOver && (
         <div className="w-96 h-full border-l border-white/10">
           <RankingSidebar players={roomPlayers} hostId={hostId} />
         </div>
