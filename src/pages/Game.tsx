@@ -45,7 +45,6 @@ const Game = () => {
     questionStartedAt: null
   });
 
-  // Refs para evitar stale closures no timer
   const selectedOptionRef = useRef<number | null>(null);
   const stateRef = useRef(state);
 
@@ -54,7 +53,6 @@ const Game = () => {
     stateRef.current = state;
   }, [state]);
 
-  // Lógica Anti-Cheat
   useEffect(() => {
     if (isHost || state.roomStatus !== 'playing' || state.isGameOver || isSpectator) return;
 
@@ -84,7 +82,6 @@ const Game = () => {
     };
   }, [isHost, state.roomStatus, state.isGameOver, isSpectator]);
 
-  // Sincronização Realtime
   useEffect(() => {
     if (!roomCode) return;
 
@@ -158,7 +155,6 @@ const Game = () => {
   };
 
   const handleTimeUp = async () => {
-    // Usamos refs aqui para pegar os valores MAIS RECENTES, ignorando a clausura do useEffect
     if (stateRef.current.showResult) return;
     
     const currentQ = getCurrentQuestion(stateRef.current.currentQuestionIndex);
@@ -182,7 +178,8 @@ const Game = () => {
       } else {
         pointsChange = -totalPoints;
         
-        if (stateRef.current.currentQuestionIndex < 3) shouldEliminate = true;
+        // Lógica de Eliminação: 1-5 (index 0-4), Maldade, Professor, Difíceis ou Sem Resposta
+        if (stateRef.current.currentQuestionIndex < 5) shouldEliminate = true;
         if (currentQ.isMaldade) shouldEliminate = true;
         if (stateRef.current.currentQuestionIndex === 999) shouldEliminate = true;
         if (currentQ.difficulty === 'difícil') shouldEliminate = true;
@@ -212,10 +209,11 @@ const Game = () => {
       setTimeout(async () => {
         let nextIndex = stateRef.current.currentQuestionIndex + 1;
         
-        if (stateRef.current.currentQuestionIndex === 8) {
+        // Pegadinha do Professor após a questão 8 (index 7)
+        if (stateRef.current.currentQuestionIndex === 7) {
           nextIndex = 999;
         } else if (stateRef.current.currentQuestionIndex === 999) {
-          nextIndex = 9;
+          nextIndex = 8;
         }
 
         if (nextIndex >= QUESTIONS.length && stateRef.current.currentQuestionIndex !== 999) {
@@ -231,7 +229,6 @@ const Game = () => {
     }
   };
 
-  // Timer Sincronizado
   useEffect(() => {
     if (state.roomStatus !== 'playing' || state.isGameOver || !state.questionStartedAt || state.showResult) return;
 
@@ -292,14 +289,14 @@ const Game = () => {
         roomCode={roomCode || ''}
         players={roomPlayers}
         showResult={state.showResult}
-        currentQuestionIndex={state.currentQuestionIndex === 999 ? 9 : state.currentQuestionIndex}
-        totalQuestions={QUESTIONS.length}
+        currentQuestionIndex={state.currentQuestionIndex === 999 ? 8 : state.currentQuestionIndex >= 8 ? state.currentQuestionIndex + 1 : state.currentQuestionIndex}
+        totalQuestions={QUESTIONS.length + 1}
       />
     );
   }
 
   const currentQ = getCurrentQuestion(state.currentQuestionIndex);
-  const isEliminatory = state.currentQuestionIndex < 3 || currentQ.difficulty === 'difícil' || currentQ.isMaldade || state.currentQuestionIndex === 999;
+  const isEliminatory = state.currentQuestionIndex < 5 || currentQ.difficulty === 'difícil' || currentQ.isMaldade || state.currentQuestionIndex === 999;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 overflow-hidden">
@@ -352,7 +349,7 @@ const Game = () => {
             </div>
           ) : (
             <div className="w-full space-y-6">
-              <ScoreBoard score={state.score} current={state.currentQuestionIndex === 999 ? 10 : state.currentQuestionIndex + 1} total={QUESTIONS.length} playerName={playerName} />
+              <ScoreBoard score={state.score} current={state.currentQuestionIndex === 999 ? 9 : state.currentQuestionIndex >= 8 ? state.currentQuestionIndex + 2 : state.currentQuestionIndex + 1} total={QUESTIONS.length + 1} playerName={playerName} />
               
               {isEliminatory && (
                 <div className="bg-red-600/20 border-2 border-red-600 p-4 rounded-2xl flex items-center justify-center gap-3 animate-pulse">
