@@ -48,11 +48,16 @@ const Game = () => {
 
   const selectedOptionRef = useRef<number | null>(null);
   const stateRef = useRef(state);
+  const roomPlayersRef = useRef(roomPlayers);
 
   useEffect(() => {
     selectedOptionRef.current = state.selectedOption;
     stateRef.current = state;
   }, [state]);
+
+  useEffect(() => {
+    roomPlayersRef.current = roomPlayers;
+  }, [roomPlayers]);
 
   useEffect(() => {
     if (isHost || state.roomStatus !== 'playing' || state.isGameOver || isSpectator) return;
@@ -210,14 +215,22 @@ const Game = () => {
     if (isHost) {
       setTimeout(async () => {
         let nextIndex = stateRef.current.currentQuestionIndex + 1;
+        let isLastQuestion = false;
         
+        // Sequência: 0-7 -> 999 -> 8-14
         if (stateRef.current.currentQuestionIndex === 7) {
           nextIndex = 999;
         } else if (stateRef.current.currentQuestionIndex === 999) {
           nextIndex = 8;
+        } else if (stateRef.current.currentQuestionIndex === 14) {
+          isLastQuestion = true;
         }
 
-        if (nextIndex >= QUESTIONS.length && stateRef.current.currentQuestionIndex !== 999) {
+        // Verifica se todos os jogadores (exceto o host se ele não estiver jogando) foram eliminados
+        const activePlayers = roomPlayersRef.current.filter(p => p.id !== hostId);
+        const allEliminated = activePlayers.length > 0 && activePlayers.every(p => p.is_eliminated);
+
+        if (isLastQuestion || allEliminated) {
           await supabase.from('rooms').update({ status: 'finished' }).eq('code', roomCode);
         } else {
           await supabase.from('rooms').update({ 
@@ -303,7 +316,6 @@ const Game = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 overflow-hidden">
       <div className="flex-1 flex flex-col p-6 relative overflow-y-auto custom-scrollbar">
-        {/* Header (Oculto no Game Over) */}
         {!state.isGameOver && (
           <div className="flex justify-between items-center mb-8 glass-dark p-6 rounded-[2.5rem] border-2 border-white/10">
             <div className="flex items-center gap-4">
@@ -354,7 +366,6 @@ const Game = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end mb-16">
-                {/* Segundo Lugar */}
                 {sortedWinners[1] && (
                   <div className="order-2 md:order-1 flex flex-col items-center gap-4 animate-in slide-in-from-bottom duration-1000 delay-200">
                     <div className="relative">
@@ -376,7 +387,6 @@ const Game = () => {
                   </div>
                 )}
 
-                {/* Primeiro Lugar */}
                 {sortedWinners[0] && (
                   <div className="order-1 md:order-2 flex flex-col items-center gap-6 animate-in slide-in-from-bottom duration-1000">
                     <div className="relative">
@@ -401,7 +411,6 @@ const Game = () => {
                   </div>
                 )}
 
-                {/* Terceiro Lugar */}
                 {sortedWinners[2] && (
                   <div className="order-3 flex flex-col items-center gap-4 animate-in slide-in-from-bottom duration-1000 delay-500">
                     <div className="relative">
