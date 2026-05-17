@@ -3,217 +3,217 @@ import { Question } from '../types/game';
 export const QUESTIONS: Question[] = [
   {
     id: 1,
-    text: "O que é saúde mental segundo a OMS?",
+    text: "A definição de saúde mental da OMS enfatiza principalmente:",
     options: [
-      "Um estado onde não existe tristeza ou ansiedade",
-      "Um estado de bem-estar que permite lidar com o estresse e contribuir com a comunidade",
-      "Um estado de ausência de doenças físicas",
-      "Um estado onde a pessoa não precisa de apoio emocional"
+      "A) Bem-estar e capacidade funcional no cotidiano",
+      "B) Ausência completa de sofrimento emocional",
+      "C) Controle total das emoções em qualquer situação",
+      "D) Ausência de transtornos psiquiátricos diagnosticados"
     ],
-    correctAnswer: 1,
+    correctAnswer: 0,
     difficulty: 'fácil',
-    explanation: "A OMS define saúde mental como um estado de bem-estar no qual o indivíduo percebe suas próprias habilidades, pode lidar com os estresses cotidianos, trabalhar produtivamente e contribuir para sua comunidade.",
+    explanation: "A OMS define saúde mental como um estado de bem-estar que permite ao indivíduo lidar com o estresse e contribuir com sua comunidade.",
     hint: "Pense na saúde como algo positivo e funcional, não apenas a falta de doença."
   },
   {
     id: 2,
-    text: "Qual desses fatores pode contribuir para o adoecimento mental na enfermagem?",
+    text: "No contexto hospitalar, um fator diretamente relacionado ao desgaste psíquico é:",
     options: [
-      "Jornada curta e descanso constante",
-      "Pouco contato com pacientes",
-      "Plantões exaustivos e longas jornadas",
-      "Falta de responsabilidade profissional"
+      "A) Redução de responsabilidades clínicas",
+      "B) Rotina previsível e estável",
+      "C) Exposição repetida a sofrimento, urgências e morte",
+      "D) Trabalho com baixa carga emocional"
     ],
     correctAnswer: 2,
     difficulty: 'fácil',
-    explanation: "A exaustão física e mental causada por plantões dobrados e falta de descanso é um dos principais gatilhos para transtornos como Burnout na enfermagem.",
-    hint: "O cansaço físico extremo costuma andar de mãos dadas com o mental."
+    explanation: "A exposição frequente ao sofrimento humano e situações críticas é um dos principais estressores ocupacionais na saúde.",
+    hint: "O contato direto com a dor alheia tem um custo emocional."
   },
   {
     id: 3,
-    text: "Qual sentimento é comum em profissionais que convivem com dor e morte diariamente?",
+    text: "A ansiedade se torna patológica principalmente quando:",
     options: [
-      "Euforia constante",
-      "Indiferença total sempre",
-      "Tristeza e desgaste emocional",
-      "Felicidade automática"
-    ],
-    correctAnswer: 2,
-    difficulty: 'fácil',
-    explanation: "A exposição constante ao sofrimento alheio pode gerar a 'fadiga por compaixão', resultando em desgaste emocional profundo.",
-    hint: "A empatia pode gerar um custo emocional alto."
-  },
-  {
-    id: 4,
-    text: "O que pode acontecer quando a saúde mental do profissional de enfermagem é afetada?",
-    options: [
-      "A qualidade do atendimento pode ser comprometida",
-      "O atendimento melhora automaticamente",
-      "O paciente não sofre impacto nenhum",
-      "A enfermagem se torna mais fácil"
-    ],
-    correctAnswer: 0,
-    difficulty: 'fácil',
-    explanation: "Um profissional psicologicamente abalado tem maior probabilidade de cometer erros técnicos e ser menos empático, prejudicando a segurança do paciente.",
-    hint: "Quem não está bem, dificilmente consegue cuidar bem do outro."
-  },
-  {
-    id: 5,
-    text: "Qual desses NÃO é um fator de adoecimento mental na enfermagem?",
-    options: [
-      "Sobrecarga de trabalho",
-      "Falta de reconhecimento profissional",
-      "Escassez de recursos",
-      "Intervalos longos de descanso e férias constantes"
+      "A) Surge antes de situações importantes",
+      "B) Acontece apenas em ambientes hospitalares",
+      "C) Aparece em situações de perigo real",
+      "D) É persistente e causa prejuízo funcional na rotina"
     ],
     correctAnswer: 3,
     difficulty: 'fácil',
+    explanation: "Diferente da ansiedade normal, a patológica é desproporcional, persistente e impede a realização de tarefas diárias.",
+    hint: "O divisor de águas é o quanto isso atrapalha sua vida."
+  },
+  {
+    id: 4,
+    text: "Sobrecarga de trabalho na enfermagem ocorre quando:",
+    options: [
+      "A) Há excesso de demanda para poucos profissionais disponíveis",
+      "B) Há divisão equilibrada de tarefas e pausas suficientes",
+      "C) Existe autonomia total para todos na equipe",
+      "D) Há baixa responsabilidade técnica no setor"
+    ],
+    correctAnswer: 0,
+    difficulty: 'fácil',
+    explanation: "A sobrecarga é caracterizada pelo desequilíbrio entre o volume de trabalho e os recursos humanos disponíveis.",
+    hint: "É quando a conta de 'pacientes vs profissionais' não fecha."
+  },
+  {
+    id: 5,
+    text: "A falta de reconhecimento profissional tende a gerar:",
+    options: [
+      "A) Maior resiliência automática e motivação",
+      "B) Desmotivação e sensação de desvalorização",
+      "C) Redução de conflitos e estresse",
+      "D) Melhora da produtividade por pressão psicológica"
+    ],
+    correctAnswer: 1,
+    difficulty: 'fácil',
     isBonus: true,
-    explanation: "O descanso adequado e o lazer são fatores de proteção, não de adoecimento.",
-    hint: "Procure a opção que descreve algo saudável e relaxante."
+    explanation: "A desvalorização profissional é um fator psicossocial de risco que impacta diretamente na saúde mental do trabalhador.",
+    hint: "Como você se sente quando seu esforço não é notado?"
   },
   {
     id: 6,
-    text: "O que é assédio moral no trabalho?",
+    text: "Segundo Hirigoyen, o elemento que mais caracteriza assédio moral é:",
     options: [
-      "Um elogio repetitivo para aumentar a motivação",
-      "Um conflito pontual entre colegas",
-      "Uma conduta abusiva, repetitiva e intencional que fere a dignidade psíquica",
-      "Uma cobrança normal de produtividade"
+      "A) A existência de um conflito aberto e direto entre colegas",
+      "B) A cobrança institucional por produtividade elevada",
+      "C) A repetição sistemática de condutas abusivas com intenção de fragilizar a vítima",
+      "D) O estresse intenso causado pela rotina hospitalar"
     ],
     correctAnswer: 2,
     difficulty: 'médio',
     isMaldade: true,
-    explanation: "O assédio moral caracteriza-se pela repetição de atos humilhantes que visam desestabilizar emocionalmente a vítima no ambiente laboral.",
-    hint: "É algo tóxico, persistente e que visa diminuir o outro."
+    explanation: "O assédio moral exige repetição e a intenção deliberada de desestabilizar emocionalmente o outro.",
+    hint: "Não é um conflito isolado, é algo persistente e tóxico."
   },
   {
     id: 7,
-    text: "Por que o ambiente hospitalar favorece o estresse psicológico?",
+    text: "Burnout se diferencia de estresse comum principalmente porque:",
     options: [
-      "Porque sempre há silêncio e calma",
-      "Porque não existe pressão",
-      "Porque é um ambiente agitado, com emergências e cobranças constantes",
-      "Porque os profissionais trabalham sozinhos"
+      "A) É sempre acompanhado por delírios e alucinações",
+      "B) É um processo crônico relacionado ao trabalho e ao esgotamento emocional",
+      "C) Surge apenas por acontecimentos traumáticos isolados",
+      "D) Se manifesta apenas como dor física, sem impacto emocional"
     ],
-    correctAnswer: 2,
+    correctAnswer: 1,
     difficulty: 'médio',
-    explanation: "A imprevisibilidade das emergências e a responsabilidade sobre vidas humanas tornam o hospital um ambiente de alta carga tensional.",
-    hint: "Hospitais são lugares de decisões rápidas e vida ou morte."
+    explanation: "O Burnout é uma síndrome especificamente ligada ao contexto laboral e ao esgotamento de recursos internos.",
+    hint: "Pense em algo que 'queima' lentamente até o fim."
   },
   {
     id: 8,
-    text: "O que significa “sobrecarga de trabalho” na enfermagem?",
+    text: "Um ambiente com alta cobrança e baixa autonomia tende a gerar no trabalhador:",
     options: [
-      "Poucos pacientes para muitos profissionais",
-      "Muitos profissionais para poucos pacientes",
-      "Poucos profissionais para muitos pacientes, aumentando tarefas e responsabilidades",
-      "Trabalhar apenas em horário comercial"
+      "A) Sensação de impotência e aumento de tensão emocional",
+      "B) Redução automática de ansiedade com o tempo",
+      "C) Aumento do controle emocional e produtividade constante",
+      "D) Melhora contínua do humor e da autoestima"
     ],
-    correctAnswer: 2,
+    correctAnswer: 0,
     difficulty: 'médio',
-    explanation: "O dimensionamento inadequado de pessoal obriga o profissional a realizar tarefas além de sua capacidade, gerando estresse e fadiga.",
-    hint: "É quando a demanda é muito maior que a capacidade humana de atender."
+    explanation: "O modelo de 'Exigência-Controle' mostra que alta demanda sem poder de decisão é altamente estressante.",
+    hint: "É a sensação de ser cobrado por algo que você não controla."
   },
   {
     id: 9,
-    text: "Qual transtorno é frequentemente associado ao excesso de estresse no trabalho?",
+    text: "A depressão, em comparação com tristeza comum, se caracteriza mais por:",
     options: [
-      "Síndrome de Burnout",
-      "Daltonismo",
-      "Amnésia total",
-      "Sonambulismo"
+      "A) Duração curta e sem prejuízo funcional",
+      "B) Aumento de energia e melhora do desempenho",
+      "C) Persistência, perda de prazer e prejuízo no funcionamento diário",
+      "D) Oscilação rápida de humor com melhora espontânea"
     ],
-    correctAnswer: 0,
+    correctAnswer: 2,
     difficulty: 'médio',
-    explanation: "O Burnout é o esgotamento profissional resultante de estresse crônico no local de trabalho que não foi gerenciado com sucesso.",
-    hint: "O termo em inglês significa 'queimar-se por completo'."
+    explanation: "A depressão patológica envolve anedonia (perda de prazer) e dura muito mais que uma tristeza passageira.",
+    hint: "A tristeza passa, a depressão permanece e paralisa."
   },
   {
     id: 10,
-    text: "A depressão, no sentido patológico, pode levar a qual consequência grave?",
+    text: "O adoecimento mental do profissional pode aumentar risco ao paciente porque:",
     options: [
-      "Aumento permanente de energia",
-      "Ausência total de sono por prazer",
-      "Pensamentos que podem culminar em comportamentos suicidas",
-      "Melhora imediata do humor"
+      "A) O paciente se torna mais agressivo ao perceber tensão",
+      "B) O profissional perde totalmente a capacidade técnica",
+      "C) O hospital reduz automaticamente sua equipe",
+      "D) Pode comprometer atenção, julgamento e tomada de decisão"
     ],
-    correctAnswer: 2,
+    correctAnswer: 3,
     difficulty: 'médio',
     isBonus: true,
-    explanation: "A depressão grave pode levar à ideação suicida, exigindo intervenção imediata e suporte especializado.",
-    hint: "A depressão profunda retira a esperança e o sentido da vida."
+    explanation: "O sofrimento psíquico afeta funções cognitivas essenciais para a segurança do paciente.",
+    hint: "Quem não está bem mentalmente tem mais chance de cometer erros."
   },
   {
     id: 11,
-    text: "Qual é uma característica da ansiedade patológica?",
+    text: "O termo “distresse” se refere a:",
     options: [
-      "Dura poucos minutos e não interfere na vida",
-      "É proporcional ao perigo real",
-      "Preocupação excessiva e persistente que interfere nas atividades diárias",
-      "Só acontece durante provas"
+      "A) Estresse positivo que melhora desempenho",
+      "B) Estresse prejudicial que ultrapassa capacidade de adaptação",
+      "C) Estado neutro de alerta sem impacto psicológico",
+      "D) Relaxamento fisiológico após pressão"
     ],
-    correctAnswer: 2,
+    correctAnswer: 1,
     difficulty: 'difícil',
-    explanation: "Diferente da ansiedade normal, a patológica é desproporcional ao estímulo e causa prejuízos funcionais significativos.",
-    hint: "Diferente do medo normal, ela é desproporcional e paralisante."
+    explanation: "Distresse é o estresse nocivo, que causa danos à saúde, ao contrário do eustresse (estresse positivo).",
+    hint: "É o lado 'ruim' e desadaptativo do estresse."
   },
   {
     id: 12,
-    text: "Segundo o texto, qual é um dos efeitos do trabalho em regime precarizado/terceirizado?",
+    text: "Qual conjunto de sinais é mais compatível com ansiedade patológica?",
     options: [
-      "Redução do estresse emocional",
-      "Aumento do distresse emocional e sobrecarga mental",
-      "Melhora automática do sono",
-      "Eliminação da ansiedade"
-    ],
-    correctAnswer: 1,
-    difficulty: 'difícil',
-    explanation: "A instabilidade contratual e a perda de direitos aumentam a insegurança e o sofrimento psíquico do trabalhador.",
-    hint: "A instabilidade gera insegurança e medo do futuro."
-  },
-  {
-    id: 13,
-    text: "Segundo Hirigoyen (2002), o assédio moral tem como objetivo principal:",
-    options: [
-      "Ajudar o outro a evoluir",
-      "Controlar e dominar o oponente, usurpando seu território psíquico",
-      "Resolver conflitos com diálogo",
-      "Melhorar o desempenho geral do hospital"
-    ],
-    correctAnswer: 1,
-    difficulty: 'difícil',
-    explanation: "Hirigoyen descreve o assédio como um processo de destruição psicológica onde o agressor tenta anular a identidade da vítima.",
-    hint: "É uma relação de poder onde um tenta anular a mente do outro."
-  },
-  {
-    id: 14,
-    text: "Qual destes sintomas pode aparecer na ansiedade e afetar o corpo fisicamente?",
-    options: [
-      "Taquicardia e tremores",
-      "Crescimento ósseo acelerado",
-      "Visão perfeita",
-      "Aumento automático da memória"
+      "A) Preocupação persistente + sintomas físicos + prejuízo funcional",
+      "B) Nervosismo pontual + alívio rápido + sono normal",
+      "C) Medo leve + melhora espontânea em minutos",
+      "D) Irritação eventual sem impacto na rotina"
     ],
     correctAnswer: 0,
     difficulty: 'difícil',
-    explanation: "A ansiedade ativa o sistema nervoso simpático, causando reações físicas como palpitações, sudorese e tremores.",
-    hint: "O corpo reage como se estivesse em perigo iminente (luta ou fuga)."
+    explanation: "A tríade de persistência, sintomas somáticos e impacto na vida define a patologia.",
+    hint: "Não é apenas um 'friozinho na barriga' antes da prova."
   },
   {
-    id: 15,
-    text: "Por que “cuidar de quem cuida” é considerado essencial no texto?",
+    id: 13,
+    text: "Relações hierárquicas verticais rígidas podem favorecer assédio moral porque:",
     options: [
-      "Porque a enfermagem não precisa de apoio psicológico",
-      "Porque melhora a aparência dos hospitais",
-      "Porque valorizar e apoiar profissionais melhora a qualidade da saúde e protege vidas",
-      "Porque reduz o número de pacientes automaticamente"
+      "A) Reduzem conflitos interpessoais automaticamente",
+      "B) Favorecem igualdade entre membros da equipe",
+      "C) Facilitam abuso de poder e silenciamento da vítima",
+      "D) Diminuem pressão psicológica no ambiente"
     ],
     correctAnswer: 2,
     difficulty: 'difícil',
+    explanation: "Estruturas muito rígidas dificultam a denúncia e protegem o agressor que detém o poder.",
+    hint: "Onde o poder é absoluto, o abuso encontra espaço."
+  },
+  {
+    id: 14,
+    text: "A despersonalização, presente em Burnout, significa:",
+    options: [
+      "A) Perda de memória e desorientação",
+      "B) Redução da empatia e distanciamento emocional do paciente",
+      "C) Euforia persistente e hiperatividade",
+      "D) Alucinações e delírios"
+    ],
+    correctAnswer: 1,
+    difficulty: 'difícil',
+    explanation: "É um mecanismo de defesa onde o profissional passa a tratar o paciente como um objeto ou número.",
+    hint: "É quando o 'cuidar' se torna mecânico e frio."
+  },
+  {
+    id: 15,
+    text: "Qual intervenção institucional tem maior impacto na prevenção do adoecimento mental?",
+    options: [
+      "A) Apoio psicológico, dimensionamento adequado e valorização profissional",
+      "B) Aumento de carga horária para adaptação",
+      "C) Punição rígida para evitar erros",
+      "D) Cobrança de produtividade como meta principal"
+    ],
+    correctAnswer: 0,
+    difficulty: 'difícil',
     isBonus: true,
-    explanation: "A saúde do profissional é indissociável da qualidade da assistência prestada. Cuidar do cuidador é uma estratégia de segurança do paciente.",
-    hint: "Profissionais saudáveis salvam mais vidas."
+    explanation: "Prevenção exige mudanças estruturais no ambiente de trabalho, não apenas ações individuais.",
+    hint: "Cuidar de quem cuida exige recursos e respeito."
   }
 ];
 
@@ -221,21 +221,13 @@ export const PROFESSOR_TRICK: Question = {
   id: 999,
   text: "Qual o nome completo do professor da disciplina Psicologia em Saúde?",
   options: [
-    "Moacir Lira de Oliveira",
-    "Moacir Oliveira Lima",
-    "Moacir Lira Oliveira Santos",
-    "Moacir Lima de Andrade"
+    "A) Moacir Oliveira Lira",
+    "B) Moacir Lira Oliveira Santos",
+    "C) Moacir Lima de Oliveira",
+    "D) Moacir Lira de Oliveira"
   ],
-  correctAnswer: 0,
+  correctAnswer: 3,
   difficulty: 'difícil',
-  explanation: "O professor Moacir Lira de Oliveira é o responsável por guiar seus conhecimentos nesta jornada!",
+  explanation: "O professor Moacir Lira de Oliveira é quem guia seus estudos nesta jornada!",
   hint: "Lembre-se da chamada ou do plano de ensino!"
 };
-
-export const MOTIVATIONAL_PHRASES = [
-  "A mente humana é o maior enigma.",
-  "Nem toda escolha é racional.",
-  "O erro também é parte do aprendizado.",
-  "Conhecer a si mesmo é o começo de toda sabedoria.",
-  "A psicologia é a ciência da alma e do comportamento."
-];

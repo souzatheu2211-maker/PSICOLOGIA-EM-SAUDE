@@ -18,11 +18,11 @@ export interface Player {
   avatar_url?: string;
   score: number;
   is_eliminated: boolean;
-  last_answer?: number | null;
+  current_question?: number;
 }
 
 export interface GameState {
-  currentQuestionIndex: number;
+  currentQuestionIndex: number; // -1 = Pegadinha do Professor
   score: number;
   aidsUsed: {
     fiftyFifty: boolean;
@@ -35,5 +35,6 @@ export interface GameState {
   selectedOption: number | null;
   showResult: boolean;
   roomStatus: 'waiting' | 'playing' | 'finished';
-  hiddenOptions: number[]; // Índices das opções escondidas pelo 50/50
+  hiddenOptions: number[];
+  questionStartedAt: string | null;
 }

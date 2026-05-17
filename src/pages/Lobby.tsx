@@ -34,21 +34,20 @@ const Lobby = () => {
 
     setLoading(true);
     try {
-      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const randomNum = Math.floor(100000 + Math.random() * 900000);
       const newCode = `PSI${randomNum}`;
       
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Cria a sala
       const { error: roomError } = await supabase.from('rooms').insert({
         code: newCode,
         host_id: user?.id,
-        status: 'waiting'
+        status: 'waiting',
+        current_question_index: 0
       });
 
       if (roomError) throw roomError;
 
-      // Adiciona o host à sala como jogador também
       if (user) {
         await supabase.from('profiles').update({ 
           current_room_id: newCode,
@@ -69,25 +68,26 @@ const Lobby = () => {
   };
 
   const joinRoom = async () => {
-    if (!code.trim()) {
-      showError("Digite o código da sala!");
-      return;
-    }
-    if (!warName.trim()) {
-      showError("O Nome de Guerra é obrigatório!");
+    if (!code.trim() || !warName.trim()) {
+      showError("Preencha todos os campos!");
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.from('rooms').select('*').eq('code', code.toUpperCase()).single();
+      const { data: room, error } = await supabase.from('rooms').select('*').eq('code', code.toUpperCase()).single();
       
-      if (error || !data) {
-        throw new Error("Sala não encontrada! Verifique o código.");
-      }
+      if (error || !room) throw new Error("Sala não encontrada!");
+      if (room.status !== 'waiting') throw new Error("A partida já começou!");
 
-      if (data.status !== 'waiting') {
-        throw new Error("A partida já começou ou foi finalizada!");
+      // Verificar limite de 50 jogadores
+      const { count } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('current_room_id', room.code);
+
+      if (count && count >= 50) {
+        throw new Error("Sala cheia (máximo 50 participantes).");
       }
 
       localStorage.setItem('currentPlayer', warName.trim());
@@ -95,14 +95,14 @@ const Lobby = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from('profiles').update({ 
-          current_room_id: data.code,
+          current_room_id: room.code,
           current_score: 0,
           is_eliminated: false,
           name: warName.trim()
         }).eq('id', user.id);
       }
 
-      navigate(`/game?room=${data.code}`);
+      navigate(`/game?room=${room.code}`);
     } catch (error: any) {
       showError(error.message);
     } finally {
@@ -112,77 +112,36 @@ const Lobby = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 pb-32 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full"></div>
-      </div>
-
-      <div className="w-full max-w-4xl space-y-12 relative z-10 animate-in fade-in zoom-in duration-1000">
+      <div className="w-full max-w-4xl space-y-12 relative z-10">
         <div className="text-center">
           <div className="inline-flex p-4 bg-blue-600/20 rounded-3xl mb-6">
             <BrainCircuit className="text-blue-400 animate-pulse" size={40} />
           </div>
-          <h1 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-4">
-            Arena PSI
-          </h1>
-          <p className="text-blue-300 font-bold italic text-sm tracking-widest uppercase">
-            "Onde o conhecimento encontra a estratégia"
-          </p>
+          <h1 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-4">Arena PSI</h1>
         </div>
 
         <div className={profile?.is_admin ? "grid grid-cols-1 md:grid-cols-2 gap-8" : "max-w-md mx-auto w-full"}>
           {profile?.is_admin && (
-            <Card className="glass-dark border-blue-500/20 rounded-[3rem] overflow-hidden group hover:border-blue-500/50 transition-all">
+            <Card className="glass-dark border-blue-500/20 rounded-[3rem] overflow-hidden">
               <CardHeader className="text-center pt-10">
-                <div className="mx-auto w-16 h-16 bg-green-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Plus className="text-green-400" size={32} />
-                </div>
+                <Plus className="text-green-400 mx-auto mb-4" size={48} />
+                <CardTitle className="text-white text-2xl font-black italic uppercase">Criar Sala</CardTitle>
               </CardHeader>
               <CardContent className="pb-12 px-10">
-                <Button 
-                  onClick={createRoom} 
-                  disabled={loading}
-                  className="w-full bg-green-600 hover:bg-green-500 h-14 font-black rounded-2xl shadow-xl shadow-green-900/20 transition-all active:scale-95"
-                >
-                  CRIAR SALA
-                </Button>
+                <Button onClick={createRoom} disabled={loading} className="w-full bg-green-600 h-14 font-black rounded-2xl">CRIAR</Button>
               </CardContent>
             </Card>
           )}
 
-          <Card className="glass-dark border-purple-500/20 rounded-[3rem] overflow-hidden group hover:border-purple-500/50 transition-all">
+          <Card className="glass-dark border-purple-500/20 rounded-[3rem] overflow-hidden">
             <CardHeader className="text-center pt-10">
-              <div className="mx-auto w-16 h-16 bg-purple-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <LogIn className="text-purple-400" size={32} />
-              </div>
+              <LogIn className="text-purple-400 mx-auto mb-4" size={48} />
               <CardTitle className="text-white text-2xl font-black italic uppercase">Entrar no Jogo</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pb-12 px-10">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-purple-300 uppercase ml-1 tracking-widest">Código da Sala</label>
-                <Input 
-                  placeholder="PSI0000" 
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  className="bg-white/5 border-white/10 text-white text-center font-black text-xl h-12 rounded-2xl focus:ring-purple-500/50"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-purple-300 uppercase ml-1 tracking-widest">Nome de Guerra</label>
-                <Input 
-                  placeholder="Seu Nome" 
-                  value={warName}
-                  onChange={(e) => setWarName(e.target.value)}
-                  className="bg-white/5 border-white/10 text-white font-bold h-12 rounded-2xl focus:ring-purple-500/50"
-                />
-              </div>
-              <Button 
-                onClick={joinRoom}
-                disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-500 h-14 font-black rounded-2xl shadow-xl shadow-purple-900/20 transition-all active:scale-95 mt-2"
-              >
-                ENTRAR
-              </Button>
+              <Input placeholder="Código (ex: PSI123456)" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} className="bg-white/5 border-white/10 text-white text-center font-black h-12 rounded-2xl" />
+              <Input placeholder="Nome de Guerra" value={warName} onChange={(e) => setWarName(e.target.value)} className="bg-white/5 border-white/10 text-white font-bold h-12 rounded-2xl" />
+              <Button onClick={joinRoom} disabled={loading} className="w-full bg-purple-600 h-14 font-black rounded-2xl mt-2">ENTRAR</Button>
             </CardContent>
           </Card>
         </div>
