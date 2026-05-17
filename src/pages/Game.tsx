@@ -384,7 +384,7 @@ const Game = () => {
                       <div className="w-full h-px bg-white/10 my-2"></div>
 
                       <div className="space-y-4">
-                        <p className="text-blue-400 font-black uppercase text-xs tracking-[0.3em]">Justificativa do Professor</p>
+                        <p className="text-blue-400 font-black uppercase text-xs tracking-[0.3em]">Explicação do grupo</p>
                         <p className="text-white text-2xl md:text-3xl italic leading-relaxed font-medium">
                           "{currentQ.explanation}"
                         </p>
