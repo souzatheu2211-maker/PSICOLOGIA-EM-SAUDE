@@ -14,6 +14,7 @@ import { Home, Trophy, RotateCcw, Users, Eye, Maximize, Minimize, Timer as Timer
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 const Game = () => {
   const navigate = useNavigate();
