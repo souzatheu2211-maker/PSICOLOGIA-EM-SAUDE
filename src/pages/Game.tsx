@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabase';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Timer as TimerIcon, LogOut, Play, BrainCircuit, Sparkles, Trophy, AlertTriangle } from 'lucide-react';
+import { Timer as TimerIcon, LogOut, Play, BrainCircuit, Sparkles, Trophy, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 
 const Game = () => {
   const navigate = useNavigate();
@@ -174,11 +174,9 @@ const Game = () => {
 
       if (isCorrect) {
         pointsChange = totalPoints;
-        showSuccess(`CORRETO! +${pointsChange} pts`);
       } else {
         pointsChange = -totalPoints;
         
-        // Lógica de Eliminação: 1-5 (index 0-4), Maldade, Professor, Difíceis ou Sem Resposta
         if (stateRef.current.currentQuestionIndex < 5) shouldEliminate = true;
         if (currentQ.isMaldade) shouldEliminate = true;
         if (stateRef.current.currentQuestionIndex === 999) shouldEliminate = true;
@@ -187,9 +185,6 @@ const Game = () => {
 
         if (shouldEliminate) {
           setIsSpectator(true);
-          showError(noAnswer ? "TEMPO ESGOTADO! VOCÊ FOI ELIMINADO." : "RESPOSTA ERRADA! VOCÊ FOI ELIMINADO.");
-        } else {
-          showError(`ERROU! ${pointsChange} pts`);
         }
       }
 
@@ -209,7 +204,6 @@ const Game = () => {
       setTimeout(async () => {
         let nextIndex = stateRef.current.currentQuestionIndex + 1;
         
-        // Pegadinha do Professor após a questão 8 (index 7)
         if (stateRef.current.currentQuestionIndex === 7) {
           nextIndex = 999;
         } else if (stateRef.current.currentQuestionIndex === 999) {
@@ -225,7 +219,7 @@ const Game = () => {
             question_started_at: new Date().toISOString()
           }).eq('code', roomCode);
         }
-      }, 6000);
+      }, 8000); // Aumentado para 8s para dar tempo de ler a justificativa
     }
   };
 
@@ -281,7 +275,7 @@ const Game = () => {
     setUsedAidThisTurn(true);
   };
 
-  if (isHost && state.roomStatus === 'playing' && !state.isGameOver) {
+  if (isHost) {
     return (
       <TVView 
         question={getCurrentQuestion(state.currentQuestionIndex)}
@@ -289,18 +283,21 @@ const Game = () => {
         roomCode={roomCode || ''}
         players={roomPlayers}
         showResult={state.showResult}
-        currentQuestionIndex={state.currentQuestionIndex === 999 ? 8 : state.currentQuestionIndex >= 8 ? state.currentQuestionIndex + 1 : state.currentQuestionIndex}
+        currentQuestionIndex={state.currentQuestionIndex === 999 ? 9 : state.currentQuestionIndex >= 8 ? state.currentQuestionIndex + 2 : state.currentQuestionIndex + 1}
         totalQuestions={QUESTIONS.length + 1}
+        roomStatus={state.roomStatus}
       />
     );
   }
 
   const currentQ = getCurrentQuestion(state.currentQuestionIndex);
   const isEliminatory = state.currentQuestionIndex < 5 || currentQ.difficulty === 'difícil' || currentQ.isMaldade || state.currentQuestionIndex === 999;
+  const isCorrect = state.selectedOption === currentQ.correctAnswer;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 overflow-hidden">
       <div className="flex-1 flex flex-col p-6 relative overflow-y-auto custom-scrollbar">
+        {/* Header */}
         <div className="flex justify-between items-center mb-8 glass-dark p-6 rounded-[2.5rem] border-2 border-white/10">
           <div className="flex items-center gap-4">
             <div className="bg-blue-600 p-3 rounded-2xl"><BrainCircuit size={24} className="text-white" /></div>
@@ -334,13 +331,8 @@ const Game = () => {
                 <p className="text-blue-300 font-black text-xs uppercase mb-2">Código da Sala</p>
                 <p className="text-white font-black text-6xl tracking-widest">{roomCode}</p>
               </div>
-              {isHost && (
-                <Button onClick={startGame} className="w-full bg-green-600 hover:bg-green-500 h-20 text-2xl font-black rounded-[2rem]">
-                  <Play className="mr-4" size={32} /> INICIAR PARTIDA
-                </Button>
-              )}
             </div>
-          ) : state.isGameOver ? (
+          ) : state.isGameOver || state.roomStatus === 'finished' ? (
             <div className="text-center glass-dark p-16 rounded-[4rem] border-8 border-blue-600">
               <Trophy className="text-yellow-500 mx-auto mb-8" size={100} />
               <h2 className="text-6xl font-black text-white italic uppercase mb-4">Fim de Jogo!</h2>
@@ -348,10 +340,10 @@ const Game = () => {
               <Button onClick={() => navigate('/home')} className="bg-blue-600 h-16 px-12 text-xl font-black rounded-2xl">VOLTAR</Button>
             </div>
           ) : (
-            <div className="w-full space-y-6">
+            <div className="w-full space-y-6 relative">
               <ScoreBoard score={state.score} current={state.currentQuestionIndex === 999 ? 9 : state.currentQuestionIndex >= 8 ? state.currentQuestionIndex + 2 : state.currentQuestionIndex + 1} total={QUESTIONS.length + 1} playerName={playerName} />
               
-              {isEliminatory && (
+              {isEliminatory && !state.showResult && (
                 <div className="bg-red-600/20 border-2 border-red-600 p-4 rounded-2xl flex items-center justify-center gap-3 animate-pulse">
                   <AlertTriangle className="text-red-500" />
                   <span className="text-red-500 font-black uppercase italic tracking-widest">⚠️ PERGUNTA ELIMINATÓRIA - Se errar, você sai do jogo!</span>
@@ -368,10 +360,43 @@ const Game = () => {
                 hiddenOptions={state.hiddenOptions}
               />
 
+              {/* Overlay de Justificativa Centralizado */}
               {state.showResult && (
-                <div className="glass-dark p-8 rounded-[3rem] border-4 border-blue-500/30 animate-in slide-in-from-bottom duration-500">
-                  <p className="text-blue-400 font-black uppercase text-xs mb-2 tracking-widest">Justificativa do Professor</p>
-                  <p className="text-white text-xl italic leading-relaxed">"{currentQ.explanation}"</p>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+                  <div className={cn(
+                    "w-full max-w-2xl p-10 rounded-[3.5rem] border-4 shadow-[0_0_100px_rgba(0,0,0,0.5)] text-center animate-in zoom-in duration-500",
+                    isCorrect ? "bg-emerald-950/90 border-emerald-500" : "bg-red-950/90 border-red-500"
+                  )}>
+                    <div className="flex flex-col items-center gap-6">
+                      {isCorrect ? (
+                        <CheckCircle2 className="text-emerald-500" size={80} />
+                      ) : (
+                        <XCircle className="text-red-500" size={80} />
+                      )}
+                      
+                      <h2 className={cn(
+                        "text-5xl font-black italic uppercase tracking-tighter",
+                        isCorrect ? "text-emerald-400" : "text-red-400"
+                      )}>
+                        {isCorrect ? "Você Acertou!" : "Você Errou!"}
+                      </h2>
+
+                      <div className="w-full h-px bg-white/10 my-2"></div>
+
+                      <div className="space-y-4">
+                        <p className="text-blue-400 font-black uppercase text-xs tracking-[0.3em]">Justificativa do Professor</p>
+                        <p className="text-white text-2xl md:text-3xl italic leading-relaxed font-medium">
+                          "{currentQ.explanation}"
+                        </p>
+                      </div>
+
+                      {isSpectator && !isCorrect && (
+                        <div className="mt-6 bg-red-600/20 p-4 rounded-2xl border border-red-500/50">
+                          <p className="text-red-400 font-black uppercase text-xs">Você foi eliminado da competição!</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
